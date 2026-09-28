@@ -1,8 +1,8 @@
 // Remix of questura client: features/Navigation/Navbar.tsx
-// Atlantic 4: Atlantic 3's broken-rule header with a pixel globe as the mark.
+// Atlantic 4: Atlantic 3's broken-rule header with a globe as the mark.
 //
 //   1. Top: menu + section links on the left, account controls on the right,
-//      a pixel globe centred across a hairline rule that stops short of it,
+//      a globe centred across a hairline rule that stops short of it,
 //      and a small "Questurian" wordmark underneath.
 //   2. Scrolling: the rule moves with the page until it reaches the bottom
 //      of the bar, then stays there. The globe, the menu and the section
@@ -32,8 +32,7 @@
 //   --row    top-row height (its controls are centred in it)
 //   --bar    locked bar height; also where the rule parks
 //   --d      scroll distance to lock (spacer = --bar + --d)
-//   --g      globe height: 1.5x, 2x or 2.5x its 64-row pixel grid, so every
-//            pixel of it lands on whole device pixels on a 2x screen
+//   --g      globe image height (the disc fills it, bar a thin halo)
 //   --gy0    globe centre; the rule starts here, through the middle of the disc
 //   --gfade  how fast the globe fades as it goes: on phones it passes the
 //            account controls, so it is gone a quarter of the way in
@@ -45,14 +44,14 @@
 import DesktopNavbar from "./Desktop/DesktopNavbar";
 import MobileNavbar from "./Mobile/MobileNavbar";
 import Link from "@lab/stubs";
-import { Logo, PIXEL_GLOBE_ASPECT, PixelGlobe } from "./shared/components";
+import { Globe, GLOBE_ASPECT, Logo } from "./shared/components";
 import { useEffect, useRef, useState } from "react";
 
 const c = "var(--navbar-collapse, 0)";
 
 /** The rule's gap around the globe, as a multiple of its height: the whole
  *  drawing, clouds included, plus a little air either side. */
-const GLOBE_GAP = PIXEL_GLOBE_ASPECT + 0.16;
+const GLOBE_GAP = GLOBE_ASPECT + 0.16;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -232,7 +231,7 @@ export default function Navbar() {
             opacity: `max(0, 1 - ${c} * var(--gfade))`,
           }}
         >
-          <PixelGlobe className="h-[var(--g)] w-auto" />
+          <Globe className="h-[var(--g)] w-auto" />
         </Link>
 
         {/* The wordmark keeps its size and rises into the bar. Its padding is
