@@ -3,37 +3,59 @@ the component:
 
     python3 scripts/pixel-globe.py src/navbars/atlantic-4/shared/components/PixelGlobe.tsx
 
-Orthographic projection of coarse continent outlines, sampled onto a small
-grid, shaded with a top-left light, then flattened into one SVG path per colour.
+An orthographic view of the Atlantic: coarse coastlines (lon, lat) are
+projected onto a D-pixel disc, sampled 4x4 per pixel, coloured by terrain,
+shaded with a top-left light using ordered dithering between tones, outlined,
+and flattened into one SVG path per colour.
 """
 import math, sys
 
-LON0, LAT0 = -42.0, 26.0   # view centre
-D = 32                      # globe diameter in pixels
-W, H = 44, 36               # canvas (clouds overhang the globe)
-CX, CY = 22.0, 18.0         # globe centre on canvas
-SS = 4                      # supersampling per axis
+LON0, LAT0 = -28.0, 22.0    # view centre
+D = 40                       # disc diameter in pixels; the drawing's height
+PAD = 7                      # columns either side for the clouds to overhang
+W, H = D + 2 * PAD, D
+CX, CY = W / 2, H / 2
+R = D / 2 - 0.3              # a touch under half, so the rim has no 1px nubs
+SS = 4                       # supersampling per axis
 
 LAND = {
- "namerica": [(-168,66),(-162,70),(-156,71),(-140,70),(-128,70),(-115,68),(-95,72),(-85,70),(-80,64),(-94,59),(-92,57),(-82,55),(-79,51),(-77,62),(-70,60),(-64,60),(-56,52),(-60,47),(-66,45),(-70,42),(-74,40),(-76,35),(-81,31),(-80,25),(-82,27),(-84,30),(-89,30),(-94,29),(-97,26),(-97,21),(-94,18),(-90,21),(-87,21),(-88,16),(-84,15),(-83,10),(-79,9),(-77,8),(-80,7),(-83,8),(-86,12),(-92,15),(-96,16),(-105,20),(-106,23),(-112,29),(-114,31),(-117,33),(-121,35),(-124,40),(-124,46),(-125,49),(-130,54),(-135,58),(-140,60),(-148,60),(-152,58),(-158,57),(-165,55),(-162,60),(-166,62)],
- "greenland": [(-73,78),(-60,82),(-35,83),(-20,82),(-18,76),(-22,70),(-32,68),(-42,60),(-48,61),(-52,65),(-55,70),(-60,76)],
- "baffin": [(-80,64),(-62,66),(-68,72),(-80,73),(-90,70)],
- "arctic": [(-120,72),(-80,74),(-65,78),(-80,82),(-110,78)],
- "samerica": [(-77,8),(-72,12),(-64,11),(-60,9),(-52,5),(-50,0),(-44,-2),(-35,-5),(-35,-9),(-39,-14),(-40,-22),(-48,-26),(-53,-33),(-58,-38),(-62,-39),(-65,-42),(-68,-50),(-72,-54),(-75,-50),(-74,-42),(-72,-30),(-71,-18),(-76,-14),(-81,-6),(-80,-1),(-78,2)],
- "africa": [(-17,21),(-13,27),(-10,30),(-6,35),(0,36),(10,37),(11,33),(20,31),(25,32),(32,31),(33,28),(36,22),(42,12),(51,12),(51,10),(45,2),(40,-4),(40,-11),(35,-20),(33,-26),(28,-33),(20,-35),(18,-30),(12,-18),(13,-10),(9,-1),(9,4),(5,6),(-2,5),(-8,4),(-13,8),(-17,14)],
- "eurasia": [(-10,36),(-9,43),(-2,44),(-5,48),(0,49),(4,52),(8,54),(10,57),(5,58),(5,62),(14,68),(20,70),(28,71),(40,67),(44,68),(55,70),(70,73),(80,73),(100,78),(115,74),(140,73),(160,70),(180,68),(180,62),(160,60),(155,55),(140,54),(135,43),(128,35),(122,40),(121,31),(119,24),(110,20),(108,12),(104,10),(100,14),(100,6),(104,1),(98,8),(98,16),(92,22),(88,22),(80,15),(77,8),(73,20),(67,25),(57,25),(56,27),(50,30),(48,29),(51,24),(56,26),(59,22),(52,16),(43,13),(40,17),(35,28),(34,31),(36,36),(28,36),(26,40),(23,36),(21,40),(19,42),(13,45),(12,44),(16,40),(18,40),(15,38),(12,38),(8,44),(3,43),(-1,37),(-6,36)],
- "britain": [(-5,50),(1,51),(2,53),(-2,56),(-3,59),(-6,58),(-5,55),(-3,54),(-5,52)],
- "ireland": [(-10,52),(-6,52),(-6,55),(-8,55),(-10,54)],
- "iceland": [(-24,64),(-14,64),(-14,66),(-22,66.5)],
- "cuba": [(-85,22),(-74,20),(-77,21),(-84,23)],
- "madagascar": [(44,-25),(49,-15),(50,-16),(47,-25)],
+ "namerica": [(-166,68),(-163,70),(-156,71.3),(-148,70.3),(-141,69.6),(-130,70),(-124,69.5),(-115,68.8),(-108,68),(-98,68),(-94,70),(-90,68.5),(-85,69.5),(-82,67),(-86,64),(-92,62.5),(-94,59),(-92.5,57),(-88,56),(-82,55),(-79.5,52),(-79,54.5),(-77,58),(-78,62),(-73,62),(-69,59),(-65,60),(-62,57),(-60,55),(-57,53),(-56,51.5),(-59,49),(-64,49),(-66,50),(-70,47),(-66,45),(-65,43.5),(-70,43.5),(-70,41.5),(-74,40.5),(-75.5,38),(-76,35),(-78,34),(-81,31.5),(-80.5,28),(-80,25.3),(-81.5,25.5),(-82.7,28),(-84,30),(-86,30.3),(-89,30.2),(-90,29),(-93,29.7),(-95,29),(-97.3,27.5),(-97.5,24),(-97.7,21.5),(-96,19),(-94.5,18.2),(-91.5,18.5),(-90.5,21),(-87,21.5),(-87.5,18),(-88.3,16),(-86,15.9),(-83.3,15),(-83.5,11),(-81.5,9),(-79.5,9.5),(-77.4,8.6),(-77.9,7.2),(-80,7.3),(-81.5,7.8),(-83.6,8.5),(-85.7,10),(-87.5,13),(-91.5,14),(-94,16),(-96.5,15.7),(-101,17.3),(-105.5,20),(-105.5,23),(-109,26),(-112,29.5),(-114.7,31.7),(-113,29),(-111,25),(-109.9,23),(-112,24.8),(-114.2,27.8),(-116,30.5),(-117.1,32.5),(-118.5,34),(-120.6,34.6),(-122.4,37.8),(-124,40.4),(-124.2,43),(-124,46.2),(-124.7,48.4),(-123,49),(-125,50),(-128,51),(-130,54.5),(-133,57),(-136,58.5),(-140,59.8),(-146,60.5),(-151,59.5),(-152,58),(-156.5,57),(-162,55),(-164.5,54.5),(-158,58.5),(-162,60),(-165,61.5),(-166,63.5),(-161,64.5),(-165,65.5),(-168,65.7)],
+ "greenland": [(-73,78.5),(-66,81),(-55,82.3),(-40,83.5),(-25,83),(-18,81.5),(-12,81.5),(-19,77),(-18.5,75),(-22,72),(-22,70.3),(-26,68.5),(-32,68),(-38,65.5),(-41,63),(-43,60),(-45,60.5),(-48,61),(-50,63.5),(-52,65.5),(-53.5,67),(-51,69),(-54.5,70.5),(-55,72),(-58,75.5),(-66,76),(-71,77.5)],
+ "baffin": [(-80,63.5),(-73,64),(-65,64),(-62,66.5),(-66,68),(-68,70),(-71,71),(-78,72.5),(-85,73.5),(-89,71),(-86,69.5),(-81,69.5),(-82,66.5),(-84,65.5)],
+ "arctic": [(-125,72),(-115,74),(-105,73),(-95,74),(-90,76),(-80,76.5),(-75,79),(-65,82.5),(-90,82),(-105,79),(-120,77)],
+ "victoria": [(-118,69),(-103,68.5),(-101,70),(-107,73),(-117,72.5)],
+ "newfoundland": [(-59.3,47.6),(-56,51.6),(-53.5,49.5),(-52.7,47.5),(-55.5,46.8)],
+ "cuba": [(-85,21.9),(-82,23.1),(-78,22.4),(-74.2,20.2),(-77.7,19.9),(-80,21.8),(-84,21.9)],
+ "hispaniola": [(-74.5,18.5),(-72.8,19.9),(-68.4,18.6),(-71,17.6)],
+ "samerica": [(-77.4,8.6),(-75.6,10.8),(-73,11.8),(-71.5,12.4),(-70,11.5),(-68,10.6),(-64,10.6),(-61.8,10.7),(-60,8.5),(-57,6),(-53,5.5),(-51,4),(-50,1.8),(-48.5,-1),(-44.5,-2.5),(-41,-3),(-38,-4),(-35.2,-5.5),(-35,-8.5),(-37,-12),(-39,-15),(-39,-18),(-40.5,-21.5),(-42,-23),(-45,-23.8),(-48.5,-26.5),(-48.8,-28.5),(-51,-31),(-53,-33.8),(-55,-35),(-57.5,-35),(-57,-37),(-58,-38.5),(-62,-39),(-62.3,-41),(-65,-42),(-64,-43),(-65.5,-45),(-67.5,-46.5),(-66,-47.5),(-68,-50.5),(-69,-52.2),(-68.5,-53.5),(-71,-54),(-74.5,-52.5),(-75.5,-48),(-74,-44),(-73.5,-40),(-73.3,-37),(-71.5,-32),(-71.3,-28),(-70.3,-23),(-70.2,-18.5),(-72,-17),(-75,-15.5),(-76.3,-13.5),(-78.5,-9.5),(-80,-7),(-81.2,-5.5),(-80.3,-3.5),(-80,-2),(-80.8,-1),(-80,1),(-78.8,1.5),(-77.5,4),(-77.3,7)],
+ "africa": [(-17.1,21),(-16,23.5),(-14.5,26),(-12.8,27.8),(-9.8,29.8),(-9.5,32.5),(-6.8,34),(-5.9,35.8),(-2,35.2),(1,36.5),(5,36.9),(9.8,37.3),(11,37),(10.2,35),(11.1,33.2),(15.2,32.3),(19.8,30.5),(20.1,32.2),(22,33),(25,31.7),(29,30.9),(32.3,31.3),(32.6,29.9),(35.5,24),(37.2,21),(38.6,17.7),(39.7,15),(43.2,12.4),(44,10.5),(47,11.1),(51.2,11.8),(51,10.4),(49.5,6.5),(46,2),(42,-1),(40.2,-2.8),(39.2,-5),(39.5,-8),(40.5,-10.5),(40.5,-15),(37,-17.5),(35,-20),(35.5,-23.8),(32.8,-26),(32.5,-28.8),(30,-31.5),(27,-33.6),(22.5,-34),(20,-34.8),(18.4,-34),(18,-31.5),(15.3,-27),(14.5,-22.5),(11.8,-17.5),(12.3,-13.5),(13.7,-10.7),(12.2,-6),(9.3,-1.5),(9.5,1),(9.8,3.2),(8.5,4.5),(5.9,4.3),(4.5,6.3),(1.5,6.1),(-2,4.8),(-4.5,5.2),(-7.5,4.4),(-9.3,5.5),(-11.5,6.9),(-13.3,8.5),(-15,11),(-16.7,12.5),(-17.5,14.7),(-16.5,16.5),(-16.1,19)],
+ "madagascar": [(43.3,-22),(44.4,-16.2),(47,-15.5),(49.3,-12),(50.4,-15.5),(47.1,-24.9),(45,-25.4)],
+ "eurasia": [(-9.3,43),(-8,43.7),(-1.8,43.4),(-1.2,46),(-2.3,47.2),(-4.5,48),(-4.7,48.6),(-1.5,48.7),(-1.3,49.7),(1.5,50),(2.5,51.1),(4,51.5),(5,53.3),(8.5,53.6),(8.6,55),(8.1,56.8),(10.5,57.7),(10.5,56.3),(12.5,56),(12,54.4),(14,54),(18.5,54.8),(21,55.3),(21.2,57),(23.5,59.2),(28,59.5),(30,60),(22.8,59.9),(21.3,61),(21.5,63),(25,65),(25.4,65.7),(22,65.8),(21,64.5),(17.5,62.5),(17.3,60.6),(19,59.8),(16.5,57),(15.8,56.1),(13,55.4),(12.6,56.2),(11.7,58),(10.6,59.3),(8,58),(6,58.1),(5,60),(5,62),(7,63),(10,64),(12.5,66),(14.5,68),(16,69),(19.5,70),(23,70.8),(26,71),(28.5,70.9),(31,70),(33,69.3),(36.5,69),(41,67.5),(38,66),(35,66.3),(34.8,64.5),(37,63.8),(40.5,64.5),(44,66),(44,68.3),(46,68),(50,68),(54,68.5),(58,69),(60,69.8),(68,69),(70,72.5),(80,72),(100,78),(115,73.5),(130,71),(140,72.5),(160,70),(180,68),(180,63),(165,60),(163,57),(156,51),(155,58),(140,54),(141,48),(135,43),(129,35),(127,39),(125,39.8),(121,40.5),(122,37),(119,35),(122,30.5),(121,27),(117,23),(112,21.5),(108,21.6),(106,18),(109,12),(106.5,9.2),(104.8,8.6),(103,10.5),(100,13.4),(99,10),(100.3,6.5),(103.4,3.8),(103.5,1.3),(101,2.5),(98,8),(98.5,13),(97.5,16.5),(94.5,16),(94,19.5),(92,22),(88,21.7),(86.5,20),(84,18),(80.2,15.5),(80,10.3),(77.5,8),(76.5,9.5),(74,15),(72.7,20),(72.5,21.5),(70,22.5),(68.5,23.5),(66.5,25.4),(61.5,25.2),(57.5,25.7),(56.5,27.1),(54,26.6),(51.5,27.9),(50,30),(48,30),(48.5,28.5),(50.2,26),(51.5,24.3),(54,24.2),(56,26),(56.4,24.8),(58.8,23.5),(59.8,22.4),(58.5,20.5),(55.5,17.8),(52,16),(48.5,14),(45,12.8),(43.3,12.7),(42.7,15.5),(42.5,17.5),(40.8,19.8),(39,21.8),(38,24),(36.5,26),(34.6,28.1),(35,29.5),(34.9,31.3),(35.5,33),(36,34.6),(36,36.6),(34.5,36.8),(32.5,36.1),(30.5,36.4),(28.3,36.8),(27.2,37.5),(26.3,38.6),(26.8,39.5),(26.2,40.3),(26,41),(24,40.8),(23.7,40),(22.6,40.5),(23,39.3),(24,38.2),(22.5,36.5),(21.7,36.9),(21.1,38.3),(20.2,39.7),(19.5,41.8),(18.5,42.5),(16,43.5),(13.7,45.1),(12.3,45.3),(12.4,44.2),(13.6,43.5),(16,41.9),(18.5,40.2),(17.2,39.4),(16.5,38.4),(15.7,37.9),(15.8,40),(14,41),(12.2,41.8),(10.5,42.9),(8.8,44.4),(7.5,43.8),(6,43.1),(3.2,43.1),(3.2,42),(0.8,41),(0.3,40),(-0.3,39.4),(0.2,38.7),(-0.7,37.6),(-2.1,36.7),(-4.5,36.7),(-5.6,36),(-6.3,36.8),(-7.4,37.2),(-8.9,37),(-8.8,38.7),(-9.5,39),(-8.8,41),(-8.9,42.5)],
+ "britain": [(-5.7,50),(-3,50.6),(1.4,51.2),(1.7,52.7),(0.2,53.5),(-0.3,54.5),(-1.6,55.6),(-2.1,56.8),(-1.8,57.6),(-4,57.7),(-3,58.6),(-5,58.6),(-6.2,57.5),(-5.6,56.3),(-6.2,55.8),(-4.8,54.8),(-3.3,54.9),(-3,53.4),(-4.6,53.3),(-4.2,52.3),(-5.3,51.8),(-3.2,51.4),(-4.5,51)],
+ "ireland": [(-10,51.6),(-6.3,52.2),(-6,53.5),(-5.5,54.4),(-6.2,55.3),(-7.5,55.3),(-8.5,54.4),(-10,54.2),(-9.9,53.4),(-9.4,52.6)],
+ "iceland": [(-24,65.5),(-22,64),(-18,63.4),(-14.5,64.4),(-13.5,65.2),(-14.5,66.3),(-18,66.2),(-22.5,66.4)],
+ "svalbard": [(11,79.5),(15,77),(22,78),(25,80),(18,80.3)],
+ "sicily": [(12.4,38),(15.6,38.2),(15.1,36.7)],
+ "sardinia": [(8.4,39),(9.8,39.1),(9.6,41),(8.2,40.9)],
 }
 WATER = {
- "hudson": [(-95,60),(-85,55),(-80,55),(-78,62),(-85,64),(-94,62)],
- "black": [(28,42),(41,41),(39,45),(33,46),(30,46)],
- "caspian": [(47,37),(54,37),(53,45),(47,46)],
- "baltic": [(10,54),(22,55),(24,60),(30,60),(22,61),(20,65),(24,66),(17,62),(16,57),(12,56)],
+ "superior": [(-92,46.7),(-84.5,46.5),(-85,47.5),(-89,48.3)],
+ "michigan_huron": [(-88,41.7),(-86,42),(-84.7,45.8),(-82.5,43),(-80.2,44.5),(-81.5,46),(-84.5,46.2),(-87,46),(-88,44)],
+ "erie_ontario": [(-83.4,42),(-79,42.8),(-76.2,43.5),(-79.8,43.6),(-81.5,42.6)],
+ "black": [(27.5,42),(28,41.2),(29.5,41.2),(33,42),(36,41.7),(38,41),(41.5,41.5),(41.7,42.5),(39.5,44),(37.5,44.8),(36.5,45.4),(35,45),(33.5,44.5),(32.5,45.4),(33.5,46),(31,46.6),(30,45.5),(29.6,44.8),(28.6,44),(27.8,43)],
+ "caspian": [(47,44.5),(49,46.5),(52,46.8),(53,45),(51,43),(52.7,41.7),(53.9,40.6),(53.3,39.3),(54,37.4),(51.5,36.8),(49,37.6),(48.8,38.6),(49.4,40.3),(48,41.8)],
 }
+# Terrain boxes (lon0, lon1, lat0, lat1) over land; first match wins.
+TERRAIN = [
+ ("ice",    (-75, -10, 59, 90)),     # Greenland ice sheet
+ ("ice",    (-180, 180, 74, 90)),    # high Arctic
+ ("sand",   (-17, 33, 17, 31)),      # Sahara
+ ("sand",   (34, 60, 14, 31)),       # Arabia
+ ("sand",   (13, 25, -28, -18)),     # Namib / Kalahari
+ ("sand",   (-117, -104, 28, 37)),   # US Southwest
+ ("forest", (-75, -48, -12, 4)),     # Amazon
+ ("forest", (9, 30, -5, 5)),         # Congo
+]
 
 def inside(poly, lon, lat):
     c = False
@@ -45,10 +67,15 @@ def inside(poly, lon, lat):
                 c = not c
     return c
 
-def is_land(lon, lat):
+def terrain(lon, lat):
     if any(inside(p, lon, lat) for p in WATER.values()):
-        return False
-    return any(inside(p, lon, lat) for p in LAND.values())
+        return None
+    if not any(inside(p, lon, lat) for p in LAND.values()):
+        return None
+    for kind, (a, b, c, d) in TERRAIN:
+        if a <= lon <= b and c <= lat <= d:
+            return kind
+    return "grass"
 
 def unproject(x, y):
     """x, y in [-1, 1] (y down) -> (lon, lat) or None off the disc."""
@@ -59,127 +86,152 @@ def unproject(x, y):
     p0, l0 = math.radians(LAT0), math.radians(LON0)
     lat = math.asin(y * math.cos(p0) + z * math.sin(p0))
     lon = l0 + math.atan2(x, z * math.cos(p0) - y * math.sin(p0))
-    lon = (math.degrees(lon) + 540) % 360 - 180
-    return lon, math.degrees(lat)
+    return (math.degrees(lon) + 540) % 360 - 180, math.degrees(lat)
 
-R = D / 2
-grid = [[None] * W for _ in range(H)]   # None | ("o"|"l", shade)
-for j in range(H):
-    for i in range(W):
-        disc = land = 0
-        for sj in range(SS):
-            for si in range(SS):
-                x = (i + (si + .5) / SS - CX) / R
-                y = (j + (sj + .5) / SS - CY) / R
-                ll = unproject(x, y)
-                if ll is None: continue
-                disc += 1
-                land += is_land(*ll)
-        if disc * 2 < SS * SS: continue
-        x = (i + .5 - CX) / R; y = (j + .5 - CY) / R
-        z = math.sqrt(max(0, 1 - x * x - y * y))
-        light = -0.55 * x - 0.6 * y + 0.58 * z
-        grid[j][i] = ["l" if land * 2 >= disc else "o", light, math.hypot(x, y)]
+def in_disc(i, j):
+    return (i + .5 - CX) ** 2 + (j + .5 - CY) ** 2 <= R * R
 
-def h(i, j):
-    v = (i * 374761393 + j * 668265263) & 0xFFFFFFFF
-    v = ((v ^ (v >> 13)) * 1274126177) & 0xFFFFFFFF
-    return (v ^ (v >> 16)) / 0xFFFFFFFF
+BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
+def dither(i, j):
+    return (BAYER[j % 4][i % 4] + .5) / 16 - .5      # -0.5 .. 0.5
 
 PAL = {
-    # Ocean is the Subscribe button's blue (#3B5BDB) with its hover/active
-    # shades for the shaded side and a lighter tint for the highlight.
-    "ocean_hi": "#6F88E8", "ocean": "#3B5BDB", "ocean_mid": "#3451C7", "ocean_lo": "#2F44B0",
-    "coast": "#26399A",
-    "land_hi": "#C3E4CE", "land": "#9CCBB2", "land_lo": "#7FB598", "land_dot": "#5E9C73",
-    "cloud_hi": "#FFFFFF", "cloud": "#D6E8F8", "cloud_lo": "#B4B8F0",
+    # Ocean: the Subscribe button's blue (#3B5BDB) and its hover/active
+    # shades, a lighter tint for the lit side, and an outline.
+    "ocean_hi": "#7F97EC", "ocean_lt": "#5874E2", "ocean": "#3B5BDB",
+    "ocean_mid": "#3451C7", "ocean_lo": "#2F44B0", "coast": "#293D9F",
+    "outline": "#1D2B78",
+    "grass_hi": "#C4E6CC", "grass": "#96CBA9", "grass_lo": "#6FAE88",
+    "forest": "#5C9A72", "forest_lo": "#4A8460",
+    "sand_hi": "#F2E6BF", "sand": "#E2D09A", "sand_lo": "#C8B37A",
+    "ice_hi": "#FFFFFF", "ice": "#E6EEF9", "ice_lo": "#C3D1EC",
+    "cloud_hi": "#FFFFFF", "cloud": "#DCE7F8", "cloud_lo": "#B7C0F0",
 }
+
+# 1. Sample terrain per pixel (majority of SS x SS subsamples).
+kind = [[None] * W for _ in range(H)]    # None off-disc, "ocean", or terrain
+light = [[0.0] * W for _ in range(H)]
+LX, LY, LZ = -0.42, -0.5, 0.76
+ln = math.sqrt(LX * LX + LY * LY + LZ * LZ); LX, LY, LZ = LX / ln, LY / ln, LZ / ln
+for j in range(H):
+    for i in range(W):
+        if not in_disc(i, j): continue
+        votes = {}
+        for sj in range(SS):
+            for si in range(SS):
+                x = (i + (si + .5) / SS - CX) / (D / 2)
+                y = (j + (sj + .5) / SS - CY) / (D / 2)
+                ll = unproject(max(-1, min(1, x)), max(-1, min(1, y)))
+                t = terrain(*ll) if ll else None
+                votes[t or "ocean"] = votes.get(t or "ocean", 0) + 1
+        kind[j][i] = max(votes, key=votes.get)
+        x = (i + .5 - CX) / (D / 2); y = (j + .5 - CY) / (D / 2)
+        z = math.sqrt(max(0, 1 - x * x - y * y))
+        light[j][i] = x * LX + y * LY + z * LZ
+
+def at(i, j):
+    return kind[j][i] if 0 <= i < W and 0 <= j < H else None
+
+# 2. Colour: outline on the rim, tone bands with dithered edges inside.
 out = [[None] * W for _ in range(H)]
 for j in range(H):
     for i in range(W):
-        c = grid[j][i]
-        if not c: continue
-        kind, light, r = c
-        if kind == "o":
-            # drop shadow: land up-left of this ocean pixel
-            nb = [grid[j - 1][i] if j else None, grid[j][i - 1] if i else None]
-            if any(n and n[0] == "l" for n in nb):
+        k = kind[j][i]
+        if k is None: continue
+        if any(at(i + di, j + dj) is None for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+            out[j][i] = "outline"; continue
+        b = light[j][i] + dither(i, j) * 0.1
+        if k == "ocean":
+            # Drop shadow down-right of any coast.
+            if at(i - 1, j) not in (None, "ocean") or at(i, j - 1) not in (None, "ocean"):
                 out[j][i] = "coast"
-            elif r > 0.9 and light < 0.1: out[j][i] = "ocean_lo"
-            elif light > 0.78: out[j][i] = "ocean_hi"
-            elif light > 0.4: out[j][i] = "ocean"
-            else: out[j][i] = "ocean_mid"
+            elif b > 0.96: out[j][i] = "ocean_hi"
+            elif b > 0.82: out[j][i] = "ocean_lt"
+            elif b > 0.5: out[j][i] = "ocean"
+            elif b > 0.24: out[j][i] = "ocean_mid"
+            else: out[j][i] = "ocean_lo"
+        elif k == "forest":
+            out[j][i] = "forest" if b > 0.38 else "forest_lo"
         else:
-            n = h(i, j)
-            if r > 0.9 and light < 0.1: out[j][i] = "land_lo"
-            elif n < 0.13: out[j][i] = "land_dot"
-            elif n > 0.93 or (light > 0.62 and n > 0.6): out[j][i] = "land_hi"
-            else: out[j][i] = "land"
+            out[j][i] = f"{k}_hi" if b > 0.93 else k if b > 0.38 else f"{k}_lo"
 
-# Clouds: rows of (cols string). '#' white top, '+' body, '-' underside.
+# 3. Clouds: '#' lit top, '+' body, '-' underside. Kept inside the rows so
+# the disc still sets the drawing's height (its centre is the SVG's centre).
 CLOUDS = [
-    (2, 4, [
-        "      ####     ",
-        "    ##++++#    ",
-        "  ###+++++++#  ",
-        "-----------++  ",
+    (0, 7, [
+        "        ###        ",
+        "     ###+++##      ",
+        "   ##++++++++###   ",
+        " ##+++++++++++++#  ",
+        "-----------------  ",
     ]),
-    (0, 7, ["##  ", "--  "]),
-    (35, 12, [
-        "  ###   ",
-        " #+++## ",
-        "#+++++++",
-        "--------",
+    (W - 14, 8, [
+        "     ###      ",
+        "   ##+++##    ",
+        " ##+++++++### ",
+        "#++++++++++++#",
+        "--------------",
     ]),
-    (26, 29, [
-        "     ####       ",
-        "   ##++++##     ",
-        " ##++++++++###  ",
-        "#++++++++++++++#",
-        "----------------",
+    (W - 26, 33, [
+        "          ####         ",
+        "      ####++++##       ",
+        "    ##++++++++++###    ",
+        "  ##+++++++++++++++##  ",
+        "-----------------------",
     ]),
 ]
+# Wisps over the surface: drawn only on the disc's interior, never the rim.
+WISPS = [
+    (19, 17, ["  ###  ", "#####++"]),
+    (24, 29, ["  ##   ", "###+++ "]),
+]
 cmap = {"#": "cloud_hi", "+": "cloud", "-": "cloud_lo"}
+for x0, y0, rows in WISPS:
+    for dy, row in enumerate(rows):
+        for dx, ch in enumerate(row):
+            i, j = x0 + dx, y0 + dy
+            if ch in cmap and out[j][i] not in (None, "outline"):
+                out[j][i] = cmap[ch]
 for x0, y0, rows in CLOUDS:
     for dy, row in enumerate(rows):
         for dx, ch in enumerate(row):
             if ch in cmap and 0 <= x0 + dx < W and 0 <= y0 + dy < H:
                 out[y0 + dy][x0 + dx] = cmap[ch]
 
-sym = {"ocean_hi": ":", "ocean": ".", "ocean_mid": ",", "ocean_lo": ";", "coast": "~",
-       "land_hi": "o", "land": "O", "land_lo": "0", "land_dot": "@",
-       "cloud_hi": "#", "cloud": "+", "cloud_lo": "-"}
+SYM = {"ocean_hi": "'", "ocean_lt": ":", "ocean": ".", "ocean_mid": ",", "ocean_lo": ";",
+       "coast": "~", "outline": "@", "grass_hi": "o", "grass": "O", "grass_lo": "0",
+       "forest": "F", "forest_lo": "f", "sand_hi": "s", "sand": "S", "sand_lo": "$",
+       "ice_hi": "I", "ice": "i", "ice_lo": "!", "cloud_hi": "#", "cloud": "+", "cloud_lo": "-"}
 for row in out:
-    print("".join(sym[c] if c else " " for c in row))
+    print("".join(SYM[c] if c else " " for c in row))
 
-# Trim to used bounds.
+# Trim empty columns (rows are fixed: the disc spans them all).
 xs = [i for j in range(H) for i in range(W) if out[j][i]]
-ys = [j for j in range(H) for i in range(W) if out[j][i]]
-x0, x1, y0, y1 = min(xs), max(xs) + 1, min(ys), max(ys) + 1
+x0, x1 = min(xs), max(xs) + 1
+assert any(kind[0]) and any(kind[H - 1]), "the disc must fill the height"
 
 paths = {}
-for j in range(y0, y1):
+for j in range(H):
     i = x0
     while i < x1:
         c = out[j][i]
         k = i
         while k < x1 and out[j][k] == c: k += 1
         if c:
-            paths.setdefault(c, []).append(f"M{i - x0} {j - y0}h{k - i}v1h-{k - i}z")
+            paths.setdefault(c, []).append(f"M{i - x0} {j}h{k - i}v1h-{k - i}z")
         i = k
 
-order = list(PAL)
 lines = "\n".join(
-    f'      <path fill="{PAL[c]}" d="{"".join(paths[c])}" />' for c in order if c in paths
+    f'      <path fill="{PAL[c]}" d="{"".join(paths[c])}" />' for c in PAL if c in paths
 )
 tsx = f'''// Generated by scripts/pixel-globe.py; edit that and re-run it, not this.
-// Pixel art: an orthographic view of the Atlantic on a {x1 - x0}x{y1 - y0}
-// grid, one path per colour. Crisp edges keep the pixels square at any size;
-// size it with the className (height drives width). The disc fills the full
-// height, so its centre is the SVG's centre.
+// Pixel art: an orthographic view of the Atlantic on a {x1 - x0}x{H} grid, one
+// path per colour. Crisp edges keep the pixels square at any size; size it
+// with the className (height drives width). The disc fills the full height,
+// so its centre is the SVG's centre.
 
 /** Width / height of the whole drawing, clouds included. */
-export const PIXEL_GLOBE_ASPECT = {x1 - x0} / {y1 - y0};
+export const PIXEL_GLOBE_ASPECT = {x1 - x0} / {H};
 
 interface PixelGlobeProps {{
   className?: string;
@@ -188,7 +240,7 @@ interface PixelGlobeProps {{
 export default function PixelGlobe({{ className = "" }}: PixelGlobeProps) {{
   return (
     <svg
-      viewBox="0 0 {x1 - x0} {y1 - y0}"
+      viewBox="0 0 {x1 - x0} {H}"
       shapeRendering="crispEdges"
       aria-hidden
       className={{`block ${{className}}`}}
@@ -199,5 +251,4 @@ export default function PixelGlobe({{ className = "" }}: PixelGlobeProps) {{
 }}
 '''
 open(sys.argv[1], "w").write(tsx)
-dy = [j for j in range(H) for i in range(W) if grid[j][i]]
-print("canvas", x1 - x0, y1 - y0, "disc rows", min(dy) - y0, max(dy) + 1 - y0, file=sys.stderr)
+print("canvas", x1 - x0, H, file=sys.stderr)

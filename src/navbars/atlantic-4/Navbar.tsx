@@ -32,8 +32,8 @@
 //   --row    top-row height (its controls are centred in it)
 //   --bar    locked bar height; also where the rule parks
 //   --d      scroll distance to lock (spacer = --bar + --d)
-//   --g      globe height; a multiple of its 32-row pixel grid that lands on
-//            whole device pixels at 2x
+//   --g      globe height; a whole multiple of its 40-row pixel grid, so every
+//            pixel of it is the same size
 //   --gy0    globe centre; the rule starts here, through the middle of the disc
 //   --gfade  how fast the globe fades as it goes: on phones it passes the
 //            account controls, so it is gone a quarter of the way in
@@ -174,8 +174,8 @@ export default function Navbar() {
         [--g:80px] [--gy0:100px] [--gfade:4] [--ty0:160px] [--fs:1.2rem]
         [--x1:56px] [--tx1:50%]
         480:[--fs:1.55rem] 480:[--ty0:162px] 480:[--d:135px]
-        1024:[--row:112px] 1024:[--bar:64px] 1024:[--d:164px]
-        1024:[--g:128px] 1024:[--gy0:94px] 1024:[--gfade:0] 1024:[--ty0:190px] 1024:[--fs:2.3rem]
+        1024:[--row:112px] 1024:[--bar:64px] 1024:[--d:160px]
+        1024:[--g:120px] 1024:[--gy0:94px] 1024:[--gfade:0] 1024:[--ty0:186px] 1024:[--fs:2.3rem]
         1024:[--x1:50%] 1024:[--tx1:0%]
         1280:[--row:120px] 1280:[--d:196px]
         1280:[--g:160px] 1280:[--gy0:108px] 1280:[--ty0:220px]
