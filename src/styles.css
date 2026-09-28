@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+/* ---- Copied from questura client: styles/global/foundations.css ---- */
+html {
+  background: #F5F0E8;
+  color: #1A1A1A;
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+:root {
+  --background: #F5F0E8;
+  --background-warm: #EDE6DA;
+  --foreground: #1A1A1A;
+  --terracotta: #C65D3B;
+  --forest: #2D4A3E;
+  --ochre: #D4A574;
+  --cream: #FAF7F2;
+  --charcoal: #2C2C2C;
+  --accent: #3B5BDB;
+  --accent-soft: #9DB0F2;
+  --paper: #EFE9DE;
+
+  /* next/font variables in the real app */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-geist-sans: 'Geist', system-ui, sans-serif;
+  --font-geist-mono: 'Geist Mono', ui-monospace, monospace;
+  --font-dm-sans: 'DM Sans', system-ui, sans-serif;
+  --font-editorial-serif: 'Cormorant Garamond', Georgia, serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
+  --font-editorial: var(--font-editorial-serif);
+  --color-background-warm: var(--background-warm);
+  --color-cream: var(--cream);
+  --color-terracotta: var(--terracotta);
+  --color-forest: var(--forest);
+  --color-ochre: var(--ochre);
+  --color-charcoal: var(--charcoal);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-paper: var(--paper);
+
+  --breakpoint-280: 280px;
+  --breakpoint-320: 320px;
+  --breakpoint-380: 380px;
+  --breakpoint-480: 480px;
+  --breakpoint-550: 550px;
+  --breakpoint-640: 640px;
+  --breakpoint-768: 768px;
+  --breakpoint-1024: 1024px;
+  --breakpoint-1280: 1280px;
+  --breakpoint-1536: 1536px;
+}
+
+body {
+  margin: 0;
+  background: #F5F0E8;
+  color: #1A1A1A;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}

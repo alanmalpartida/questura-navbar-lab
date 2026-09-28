@@ -1,0 +1,62 @@
+import Link, { useAuth, useMembership } from "@lab/stubs";
+import {
+  AuthSlot,
+  MenuIcon,
+  Logo,
+  SubscribeButton,
+} from "../shared/components";
+
+export default function DesktopNavbar() {
+  const { user, loading, isAuthenticated } = useAuth();
+  const { isActive } = useMembership(user);
+  const shouldShowSubscribe = !isAuthenticated || !isActive;
+
+  return (
+    <div
+      className="w-full border-b"
+      style={{
+        borderBottomColor: "rgba(0, 0, 0, var(--navbar-border-alpha, 0.1))",
+      }}
+    >
+      <div
+        className="w-full bg-[#ece9e3] px-4"
+        style={{
+          // Padding interpolates from 24px (full) → 8px (compact) as
+          // --navbar-collapse goes 0 → 1, driven by the scroll listener in Navbar.tsx.
+          paddingTop: "calc(24px - var(--navbar-collapse, 0) * 16px)",
+          paddingBottom: "calc(24px - var(--navbar-collapse, 0) * 16px)",
+        }}
+      >
+        <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-3">
+          <div className="justify-self-start">
+            <MenuIcon iconClassName="!text-black h-6 w-6" />
+          </div>
+          <Link
+            href="/"
+            data-no-hover-underline
+            className="cursor-pointer justify-self-center"
+          >
+            <Logo />
+          </Link>
+          <div className="flex items-center justify-self-end gap-4">
+            {(loading || shouldShowSubscribe) ? (
+              <Link
+                href="/join"
+                className="nav-subscribe inline-flex items-center"
+                data-pending={loading || undefined}
+              >
+                <SubscribeButton />
+              </Link>
+            ) : null}
+            <AuthSlot
+              loading={loading}
+              isAuthenticated={isAuthenticated}
+              isMember={isActive}
+              signInClassName="!text-black"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
