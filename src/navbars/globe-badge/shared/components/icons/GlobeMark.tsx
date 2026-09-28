@@ -7,8 +7,9 @@ interface GlobeMarkProps {
 }
 
 /**
- * A small vector globe matching the join page's hero globe: the Americas, a
- * deep navy ocean, olive/khaki land, soft cloud, a sun glint. Gradient ids are
+ * A small vector globe matching the join page's hero globe: North America at
+ * night-dark navy with slate land, soft cloud, a teal rim and the page's
+ * glowing cyan hub cities. Gradient ids are
  * per instance; the navbar renders desktop and mobile copies at once, and a
  * shared id would resolve to whichever copy is hidden.
  */
@@ -18,46 +19,59 @@ export default function GlobeMark({ className = "" }: GlobeMarkProps) {
   const shade = `${id}-shade`;
   const ground = `${id}-land`;
   const glint = `${id}-glint`;
+  const glow = `${id}-glow`;
   const soft = `${id}-soft`;
 
   return (
     <svg viewBox="0 0 64 64" aria-hidden className={className}>
       <defs>
         <radialGradient id={ocean} cx="36%" cy="30%" r="75%">
-          <stop offset="0%" stopColor="#1C4C9E" />
-          <stop offset="50%" stopColor="#0A3478" />
-          <stop offset="100%" stopColor="#051A4C" />
+          <stop offset="0%" stopColor="#233A5E" />
+          <stop offset="50%" stopColor="#10264A" />
+          <stop offset="100%" stopColor="#04152A" />
         </radialGradient>
         <radialGradient id={ground} cx="36%" cy="30%" r="80%">
-          <stop offset="0%" stopColor="#ABA086" />
-          <stop offset="45%" stopColor="#8A8B6C" />
-          <stop offset="80%" stopColor="#66735A" />
-          <stop offset="100%" stopColor="#4B5A4A" />
+          <stop offset="0%" stopColor="#67676A" />
+          <stop offset="45%" stopColor="#4B5053" />
+          <stop offset="80%" stopColor="#2E3F45" />
+          <stop offset="100%" stopColor="#1C2C34" />
         </radialGradient>
         <radialGradient id={glint} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.85" />
+          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.5" />
           <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={glow}>
+          <stop offset="0%" stopColor="#4EE8D8" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#4EE8D8" stopOpacity="0" />
         </radialGradient>
         <filter id={soft} x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="1.3" />
         </filter>
         <radialGradient id={shade} cx="34%" cy="28%" r="80%">
-          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.16" />
+          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.1" />
           <stop offset="35%" stopColor="#FFFFFF" stopOpacity="0" />
           <stop offset="70%" stopColor="#05092E" stopOpacity="0" />
           <stop offset="100%" stopColor="#05092E" stopOpacity="0.55" />
         </radialGradient>
       </defs>
       <circle cx="32" cy="32" r="32" fill={`url(#${ocean})`} />
-      <path fill={`url(#${ground})`} d="M34.8 28.7L37.1 29.3L35.5 29.9L33.9 29.6L35 29.4L34.5 28.7ZM31.1 27.1L34 28.5L33.6 28.7L32.1 28.7L32.5 28.4L31.6 27.8L30 27.2L28.4 27.6L30.7 26.9ZM39.6 12.5L39.5 12.9L40.7 13.1L41.3 14.2L40.7 13.8L40.4 14.2L38.9 14L39.6 12.2ZM48.1 6.5L51.7 8.7L51.7 9.7L48 6.6ZM18.7 2.9L26.2 0.5L22.4 1.5L19 3.5L18.2 3.7L19.2 3L17.1 3.7L18.5 3ZM63.9 34.2L63.8 29.9L63.7 30.5L63.5 29.6L62 32.3L58.9 27.8L58.8 25.8L58 23.9L57.8 19L56.7 15.8L57.4 15.7L57.5 13.4L59.4 15.5L58.6 14.1L61.7 20.1L63.5 26.5L64 33.2ZM55.6 10.4L57.3 12.4L54.3 9.7L57.2 12.5L54.8 10.6L56.9 15L56.7 15.6L55.9 15.6L53.8 12.9L54.4 11.7L52.2 10.1L52.5 9.9L51 7.3L49.1 5.8L50.8 7L50.4 6.1L44.9 3L49.8 5.9L48.2 5.4L48.6 5.9L41.9 1.9L44.3 2.5L48.3 4.5L55.3 10ZM29.6 5.6L30 6.3L30.6 5.5L31.1 5.6L31.3 6.4L30.3 6.6L27.6 8.5L27.3 9.2L27.7 10L30.6 10.9L31.3 12.6L31.8 12.1L31.4 11.1L32.4 10.4L31.8 9.4L32 8.1L34.3 8.5L35 9.6L35.7 8.7L36.9 10.3L38.5 10.9L39.5 11.9L38.3 12.8L36.1 13L34.6 14.6L36.7 13.4L37.2 14.8L38.3 14.9L38.6 14.3L39 14.8L37.1 16.1L36.7 15.7L37.3 15.2L35.2 16.1L35.3 17.1L33.7 17.6L32.9 19.4L32.7 18.4L33 20.2L30.4 22.4L30.8 25.8L30.1 25.4L29.1 23.1L26.6 22.9L26.1 23.5L24.4 23.1L22.7 24L21.9 26.9L22.7 29L23.4 29.4L25 29.1L25.6 27.9L27.3 27.7L26.2 30.8L29.1 31.3L28.8 33.6L29.7 34.8L31.1 34.4L32.6 35L33.7 33.6L35.4 32.8L35.5 34.7L35.6 33.6L36.4 33L37.4 33.8L40.7 33.5L40.5 34L43.3 36L45 35.9L46.3 36.6L47 37.9L46.8 38.9L47.7 38.9L47.7 39.4L48.1 39L49.5 39.3L49.6 39.9L51.7 39.6L53.5 40.5L53.8 41.6L49.9 49.3L46.7 51.1L45.7 52.8L42.8 55.4L40.9 55.4L41.3 56.2L40.7 56.9L37.4 58.1L37.9 58.5L36.2 59.5L36.7 59.9L35.1 60.9L35.3 61.2L33.8 61.6L32.9 61.1L32.9 60.4L33.5 60L32.9 59.9L34.2 58.6L33.5 58.9L35.1 55.1L36.1 49.7L35.5 48.6L33.1 47.3L31 43.6L30.2 43L30.1 42.3L31 41.2L30.3 40.9L30.4 40.3L32.5 37.6L31.9 35.2L31.1 34.8L30.4 35.8L29.3 35.3L27.8 34.2L26.9 32.3L24.9 31.8L23.2 30.5L22.2 30.7L18.9 28.9L18.1 27.9L18.2 26.6L16.2 22.6L16.2 21.3L15.7 20.9L15.5 21.8L16.7 25.8L16.4 26L15.7 24.8L15.8 24.1L14.9 23L15.4 22.6L15 20.1L14.2 19.1L14.3 16L16.5 12.4L16.7 13L17 12.5L16.6 11.1L18 7.9L17.5 6.2L16.3 6.5L17.3 5.9L13.4 7L15.8 6.2L15.5 5.9L16.3 5.2L18.5 4.3L18.8 3.7L21.3 3L22 3.1L22.2 4.5L23.8 4.4L24.9 5.7L28.1 5.8L28.2 6.2L29.1 4.8L29.2 5.5ZM26.5 4.1L26.9 4.6L27.6 4.3L27.6 5.4L25.2 5.4L25 4.9L25.9 4.9L25.3 4.4L26.4 4ZM30.6 4.5L33 5L35.5 6.4L35.3 7L34.2 6.6L35.3 7.6L34.3 7.5L35.1 8.2L31.9 7.3L32.9 7L33.2 6.3L31.8 5.4L30 5.3L29.9 4.7L30.8 4.3ZM32.6 2.1L33.2 2.2L31.7 3.7L30.5 3.6L31.6 2.7L30.9 2.3L32.5 2.1ZM34.8 1.7L36.4 1.8L41 4.3L40.2 6.3L40.8 8.3L39.4 8L37.3 6.5L37 5.2L36.3 5.2L36.8 5L32.5 3.2L33.3 2.9L33.2 2.3L34.6 2.2L34.1 2.1L34.4 1.8Z" />
-      <g fill="#FFFFFF" opacity="0.42" filter={`url(#${soft})`}>
-        <ellipse cx="45" cy="21" rx="4.5" ry="1.8" transform="rotate(14 45 21)" />
-        <ellipse cx="16" cy="43" rx="5.5" ry="2" transform="rotate(-30 16 43)" />
-        <ellipse cx="31" cy="52" rx="6" ry="2" transform="rotate(-6 31 52)" />
+      <path fill={`url(#${ground})`} d="M42 35.7L44.2 36L42.7 36.9L41.2 36.7L42.2 36.4L41.7 35.7ZM38.3 34.6L41.2 35.6L40.8 35.9L39.4 36.1L39.7 35.8L38.8 35.2L37.2 34.8L35.6 35.3L37.8 34.5ZM43.9 17.9L43.9 18.3L45 18.3L45.8 19.5L45.2 19.1L45 19.6L43.7 19.7L43.9 17.5ZM48.7 8L52 9.4L52.6 10.9L48.7 8.2ZM44.5 7.4L45.7 8.6L44.2 8.6L44.4 7.5ZM63.8 28.2L63.6 31.4L61.8 28.7L59.7 20.2L57.9 16.3L58.2 15.8L56.9 12.3L58.6 14.2L61.3 19.1L63.7 27.6ZM50.4 5.8L56.1 11L54.5 10.2L57.7 15.2L57.9 16.1L57.5 16L57.4 16.5L55.2 14.1L55 12.2L53.1 11.2L50.7 7.7L48.7 6.4L50.3 7.2L49.3 5.8L45.7 3.6L46.4 4.4L43.8 3.4L49 6L49.6 6.6L47.9 6L48.7 6.8L48 6.6L40.9 2.8L41.4 2.7L41 2L43 2.5L36 0.5L34.5 0.7L35.7 0.3L24.8 1.7L21.3 4L20.5 4.9L21.2 4.8L21 5.3L19.3 7.5L18.3 7.6L18.9 6.4L17.1 7.1L16.1 6.6L16.4 5.7L13.2 6.6L15.7 5.3L17.7 5.3L17 5.1L17.7 4.6L16.9 4.7L18.5 3L15.4 4.6L21.5 1.8L25.8 0.6L31.3 0L35.8 0.2L41.2 1.4L45.4 2.9L50.3 5.7ZM32.3 10.8L33 11.8L33.2 10.6L33.8 10.7L34.3 11.7L33.4 12L31.4 14.6L31.2 15.5L31.9 16.4L35.1 17.3L36.2 19.2L36.5 18.5L35.9 17.4L36.7 16.4L35.9 15.4L35.6 13.8L37.9 14L39 15.2L39.3 14L40.9 15.7L42.5 16.1L43.6 17.1L42.8 18.4L40.8 19L39.8 21L41.5 19.3L42.2 20.8L43.3 20.7L43.4 20.1L43.9 20.5L42.4 22.3L42 21.9L42.4 21.3L40.6 22.6L41 23.6L39.6 24.3L40.3 24.2L39.5 24.4L39.3 25.4L39 25.1L39 26.4L38.7 25.4L39.3 27.3L37.1 29.9L37.8 33.3L37.1 33L35.8 30.7L33.4 30.7L32.9 31.4L31.1 31L29.5 32L29 35L29.9 37.1L30.7 37.5L32.3 37.1L32.9 35.9L34.6 35.5L33.6 38.7L36.6 38.9L36.5 41.2L37.4 42.2L38.8 41.7L40.3 42.1L41.2 40.7L42.8 39.7L43 41.5L43.7 39.7L44.7 40.3L47.8 39.5L47.6 40L50.2 41.3L51.6 40.9L52.8 41.3L53.4 42.3L53.1 43.2L54 43L54 43.5L54.8 43L55.4 43L55.5 43.5L57.2 42.6L58.6 42.9L58.5 44.5L54.6 51.9L48.3 57.7L46.7 58.2L46.9 58.6L46.2 59.2L39.9 62.8L37.7 63.1L39.8 61.5L39.1 61.8L41.5 59L43.2 54.7L42.7 53.9L40.5 53.1L38.7 50.1L37.9 49.7L38.8 48L38.1 47.8L38.1 47.3L40.2 44.6L40 43.2L39 42L38.4 43L37 42.7L35.5 41.8L34.4 40.1L32.4 39.8L30.6 38.5L29.6 38.8L25.9 37.1L25 36.1L24.8 34.5L21.5 28.9L21.3 29.8L23.2 34L22.9 34.2L20.9 31.1L21.4 30.7L20.5 28L19.4 26.8L18.9 24.2L20.5 19.4L20.9 20.1L21.2 19.6L20.3 17.8L20.7 13.9L19.2 11.5L17.8 11.6L18.9 11L15.6 11.9L14.2 11.6L17 11.1L16.4 10.5L16.9 9.5L18.2 8.8L18.8 9.1L19.3 8.8L18.8 8.4L19.2 7.7L19.8 8.3L20.9 7.1L22.8 7.3L23.9 9.5L25.7 9.4L27.5 11.2L30.8 11.2L31.1 11.7L31.4 9.8L31.9 10.7ZM28.5 9L29.2 9.7L29.7 9.2L30.2 10.7L27.7 10.8L27.3 10.1L28.2 10.1L27.3 9.9L27.8 9.6L27.3 9.4L28.4 8.9ZM32.9 9.3L33.5 9L33.9 9.7L35.4 9.7L36.4 10.1L36.6 10.7L38.3 11.1L38.4 12L37.2 11.7L38.6 12.7L37.6 12.8L38.6 13.4L35.2 12.8L36.1 12.2L36.1 11.4L34.5 10.4L32.6 10.4L32.3 9.7L33 9ZM27.1 9.4L26.4 9L27.8 8.3L28.4 8.8L27.2 9.3ZM33.5 5.6L34.1 5.7L33.5 8.1L32.3 8L32.8 7.6L32.5 6.7L32.9 6.6L32 6.1L33.4 5.6ZM35.3 4.6L35.8 4.6L35.9 5L36.8 4.5L42 7L41.3 7.1L41.9 7.5L42.2 7.2L42.5 10.1L43.7 12.6L42.4 12.5L40 10.9L39.2 9.3L39.1 9.7L38.5 9.4L38.9 9.1L36.4 7.8L35.1 7.9L34.5 7.6L35 7.4L34.1 7.3L34.6 6.7L34.3 5.8L35.4 5.5L35 4.8Z" />
+      <g fill="#C9D3D8" opacity="0.32" filter={`url(#${soft})`}>
+        <ellipse cx="14" cy="22" rx="5" ry="2" transform="rotate(-35 14 22)" />
+        <ellipse cx="50" cy="26" rx="4.5" ry="1.8" transform="rotate(18 50 26)" />
+        <ellipse cx="44" cy="50" rx="5.5" ry="1.8" transform="rotate(-10 44 50)" />
       </g>
-      <circle cx="30" cy="36" r="3" fill={`url(#${glint})`} />
+      <circle cx="38" cy="58" r="3" fill={`url(#${glint})`} />
       <circle cx="32" cy="32" r="32" fill={`url(#${shade})`} />
-      <circle cx="32" cy="32" r="31.4" fill="none" stroke="#8FB0EA" strokeOpacity="0.3" strokeWidth="1" />
+      <circle cx="32" cy="32" r="31.3" fill="none" stroke="#2DA0CF" strokeOpacity="0.45" strokeWidth="1.3" />
+        <circle cx="39.5" cy="24.4" r="4.6" fill={`url(#${glow})`} />
+        <circle cx="39.5" cy="24.4" r="1.9" fill="#7DF0E2" />
+        <circle cx="37.9" cy="32.9" r="4.6" fill={`url(#${glow})`} />
+        <circle cx="37.9" cy="32.9" r="1.9" fill="#7DF0E2" />
+        <circle cx="29.7" cy="29.3" r="4.6" fill={`url(#${glow})`} />
+        <circle cx="29.7" cy="29.3" r="1.9" fill="#7DF0E2" />
+        <circle cx="20.3" cy="27.3" r="4.6" fill={`url(#${glow})`} />
+        <circle cx="20.3" cy="27.3" r="1.9" fill="#7DF0E2" />
     </svg>
   );
 }
