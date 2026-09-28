@@ -20,6 +20,9 @@ export default function Navbar() {
   const navRef = useRef<HTMLElement>(null);
   // True once the rendered collapse has settled at 1.
   const [locked, setLocked] = useState(false);
+  // True while the bar is fully expanded and not heading anywhere: the only
+  // time the divider above the section row shows.
+  const [atRest, setAtRest] = useState(true);
 
   // collapsePx: scroll distance over which the navbar goes expanded → collapsed.
   // lerp: how fast the rendered value chases the target each frame.
@@ -45,6 +48,7 @@ export default function Navbar() {
       if (targetVal === 0 && currentVal < 0.005) currentVal = 0;
 
       setLocked(targetVal === 1 && currentVal >= LOCK_AT);
+      setAtRest(targetVal === 0 && currentVal < 0.02);
       const borderAlpha = currentVal === 0 || currentVal === 1 ? 0.1 : 0;
       document.documentElement.style.setProperty(
         "--navbar-collapse",
@@ -104,7 +108,7 @@ export default function Navbar() {
   return (
     <nav ref={navRef} className="sticky top-0 z-40">
       <div className="hidden 1024:block">
-        <DesktopNavbar locked={locked} />
+        <DesktopNavbar locked={locked} atRest={atRest} />
       </div>
       <div className="h-[55px] 1024:hidden">
         <MobileNavbar />
