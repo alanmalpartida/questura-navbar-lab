@@ -42,13 +42,6 @@ function Controls() {
         iconClassName="!text-black block h-5 w-5 translate-y-px"
       />
       <div className="flex shrink-0 items-center gap-2 max-[379.98px]:gap-2.5">
-        <AuthSlot
-          loading={loading}
-          isAuthenticated={isAuthenticated}
-          isMember={isActive}
-          signInClassName="!text-black h-8 inline-flex items-center leading-none text-[0.69rem]"
-          userIconClassName="shrink-0"
-        />
         {(loading || shouldShowSubscribe) ? (
           <Link
             href="/join"
@@ -58,6 +51,14 @@ function Controls() {
             <SubscribeButton />
           </Link>
         ) : null}
+        <AuthSlot
+          loading={loading}
+          isAuthenticated={isAuthenticated}
+          isMember={isActive}
+          signInClassName="!text-black h-8 inline-flex items-center leading-none text-[0.69rem]"
+          align="start"
+          userIconClassName="shrink-0"
+        />
       </div>
     </div>
   );

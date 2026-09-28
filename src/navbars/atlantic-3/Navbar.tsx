@@ -80,14 +80,14 @@ export default function Navbar() {
     <div
       ref={wrapRef}
       className="
-        [--row:55px] [--bar:55px] [--line0:84px] [--d:77px]
-        [--f0:2.1rem] [--f1:1.02rem] [--cy0:78px]
+        [--row:64px] [--bar:55px] [--line0:100px] [--d:93px]
+        [--f0:2.3rem] [--f1:1.02rem] [--cy0:94px]
         [--x1:56px] [--tx1:50%]
-        380:[--f0:2.5rem] 480:[--f1:1.35rem]
-        1024:[--row:100px] 1024:[--bar:64px] 1024:[--line0:108px] 1024:[--d:124px]
-        1024:[--f0:4.25rem] 1024:[--f1:1.9rem] 1024:[--cy0:100px]
+        380:[--f0:2.75rem] 480:[--f1:1.35rem]
+        1024:[--row:128px] 1024:[--bar:64px] 1024:[--line0:140px] 1024:[--d:166px]
+        1024:[--f0:5.25rem] 1024:[--f1:1.9rem] 1024:[--cy0:130px]
         1024:[--x1:50%] 1024:[--tx1:0%]
-        1280:[--f0:5.25rem]
+        1280:[--f0:6.5rem]
       "
     >
       {/* Holds the expanded header's place in the page. */}

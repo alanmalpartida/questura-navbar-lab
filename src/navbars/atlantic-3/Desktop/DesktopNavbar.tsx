@@ -58,13 +58,7 @@ function Controls() {
           ))}
         </ul>
       </div>
-      <div className="flex items-center gap-4">
-        <AuthSlot
-          loading={loading}
-          isAuthenticated={isAuthenticated}
-          isMember={isActive}
-          signInClassName="!text-black"
-        />
+      <div className="flex items-center gap-3">
         {(loading || shouldShowSubscribe) ? (
           <Link
             href="/join"
@@ -74,6 +68,13 @@ function Controls() {
             <SubscribeButton />
           </Link>
         ) : null}
+        <AuthSlot
+          loading={loading}
+          isAuthenticated={isAuthenticated}
+          isMember={isActive}
+          signInClassName="!text-black"
+          align="start"
+        />
       </div>
     </div>
   );
