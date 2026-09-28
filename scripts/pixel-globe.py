@@ -11,8 +11,8 @@ and flattened into one SVG path per colour.
 import math, sys
 
 LON0, LAT0 = -28.0, 22.0    # view centre
-D = 40                       # disc diameter in pixels; the drawing's height
-PAD = 7                      # columns either side for the clouds to overhang
+D = 64                       # disc diameter in pixels; the drawing's height
+PAD = 11                     # columns either side for the clouds to overhang
 W, H = D + 2 * PAD, D
 CX, CY = W / 2, H / 2
 R = D / 2 - 0.3              # a touch under half, so the rim has no 1px nubs
@@ -45,17 +45,48 @@ WATER = {
  "black": [(27.5,42),(28,41.2),(29.5,41.2),(33,42),(36,41.7),(38,41),(41.5,41.5),(41.7,42.5),(39.5,44),(37.5,44.8),(36.5,45.4),(35,45),(33.5,44.5),(32.5,45.4),(33.5,46),(31,46.6),(30,45.5),(29.6,44.8),(28.6,44),(27.8,43)],
  "caspian": [(47,44.5),(49,46.5),(52,46.8),(53,45),(51,43),(52.7,41.7),(53.9,40.6),(53.3,39.3),(54,37.4),(51.5,36.8),(49,37.6),(48.8,38.6),(49.4,40.3),(48,41.8)],
 }
+# Mountain ranges, as polygons; checked before the terrain boxes.
+MOUNTAINS = {
+ "rockies": [(-140,62),(-128,62),(-114,50),(-105,41),(-104,33),(-108,31),(-113,36),(-117,44),(-124,52),(-135,58)],
+ "appalachians": [(-87,34),(-84,33.5),(-78,38),(-72,43),(-69,46),(-72,46),(-77,42),(-82,38.5)],
+ "andes": [(-79,7),(-74,8),(-72,2),(-76,-3),(-73,-12),(-67,-17),(-67,-24),(-69,-33),(-70,-42),(-71,-50),(-74,-50),(-73,-40),(-71.5,-30),(-70.5,-22),(-71.5,-17),(-76,-12),(-79,-5),(-80,0)],
+ "alps": [(5.5,44),(10,45.8),(16,46.3),(15,47.8),(10,47.5),(6,46.5)],
+ "atlas": [(-9.5,30),(-2,33),(9,35.5),(10,36.5),(3,35),(-6,33.5),(-9.5,31.5)],
+ "scandes": [(5.5,59),(8,62),(14,66),(18,69),(20,68.5),(15,64),(9,60),(7,58.5)],
+ "caucasus": [(38,44),(49,41),(49,42.5),(40,44.8)],
+ "zagros": [(44,38),(58,27),(60,30),(48,38)],
+ "ethiopia": [(36,6),(40,5),(43,9),(40,14),(37,13)],
+}
 # Terrain boxes (lon0, lon1, lat0, lat1) over land; first match wins.
 TERRAIN = [
- ("ice",    (-75, -10, 59, 90)),     # Greenland ice sheet
- ("ice",    (-180, 180, 74, 90)),    # high Arctic
- ("sand",   (-17, 33, 17, 31)),      # Sahara
- ("sand",   (34, 60, 14, 31)),       # Arabia
- ("sand",   (13, 25, -28, -18)),     # Namib / Kalahari
- ("sand",   (-117, -104, 28, 37)),   # US Southwest
- ("forest", (-75, -48, -12, 4)),     # Amazon
- ("forest", (9, 30, -5, 5)),         # Congo
+ ("ice",     (-180, 180, 75, 90)),     # high Arctic
+ ("tundra",  (-180, 180, 62, 75)),
+ ("boreal",  (-170, -52, 50, 62)),     # Canada
+ ("boreal",  (20, 180, 52, 62)),       # Russia
+ ("sand",    (-17, 33, 17, 31)),       # Sahara
+ ("sand",    (34, 60, 14, 31)),        # Arabia
+ ("sand",    (13, 25, -28, -18)),      # Namib / Kalahari
+ ("sand",    (-117, -104, 28, 37)),    # US Southwest
+ ("sand",    (-72, -63, -50, -38)),    # Patagonia
+ ("sand",    (-71, -69, -27, -18)),    # Atacama
+ ("savanna", (-17, 40, 8, 17)),        # Sahel
+ ("savanna", (28, 42, -12, 8)),        # East Africa
+ ("savanna", (15, 35, -18, -8)),       # Southern Africa
+ ("savanna", (-55, -40, -22, -5)),     # Cerrado
+ ("savanna", (-110, -98, 20, 28)),     # Mexico
+ ("forest",  (-79, -48, -12, 5)),      # Amazon
+ ("forest",  (9, 30, -5, 5)),          # Congo
+ ("forest",  (-13, 8, 4, 8)),          # West African coast
+ ("forest",  (-92, -77, 7, 18)),       # Central America
+ ("forest",  (-95, -70, 30, 45)),      # Eastern US
 ]
+
+def bbox(poly):
+    xs = [p[0] for p in poly]; ys = [p[1] for p in poly]
+    return (min(xs), max(xs), min(ys), max(ys)), poly
+LAND_B = [(name, *bbox(p)) for name, p in LAND.items()]
+WATER_B = [bbox(p) for p in WATER.values()]
+MOUNT_B = [bbox(p) for p in MOUNTAINS.values()]
 
 def inside(poly, lon, lat):
     c = False
@@ -67,11 +98,21 @@ def inside(poly, lon, lat):
                 c = not c
     return c
 
+def hit(entry, lon, lat):
+    (a, b, c, d), poly = entry
+    return a <= lon <= b and c <= lat <= d and inside(poly, lon, lat)
+
 def terrain(lon, lat):
-    if any(inside(p, lon, lat) for p in WATER.values()):
-        return None
-    if not any(inside(p, lon, lat) for p in LAND.values()):
-        return None
+    """Surface kind at a point: 'ocean', 'seaice', or a land terrain."""
+    if any(hit(w, lon, lat) for w in WATER_B):
+        return "ocean"
+    land = next((name for name, *e in LAND_B if hit(e, lon, lat)), None)
+    if land is None:
+        return "seaice" if lat >= 79 else "ocean"
+    if land == "greenland":
+        return "ice"
+    if any(hit(m, lon, lat) for m in MOUNT_B):
+        return "mountain"
     for kind, (a, b, c, d) in TERRAIN:
         if a <= lon <= b and c <= lat <= d:
             return kind
@@ -95,21 +136,31 @@ BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]
 def dither(i, j):
     return (BAYER[j % 4][i % 4] + .5) / 16 - .5      # -0.5 .. 0.5
 
-PAL = {
-    # Ocean: the Subscribe button's blue (#3B5BDB) and its hover/active
-    # shades, a lighter tint for the lit side, and an outline.
-    "ocean_hi": "#7F97EC", "ocean_lt": "#5874E2", "ocean": "#3B5BDB",
-    "ocean_mid": "#3451C7", "ocean_lo": "#2F44B0", "coast": "#293D9F",
-    "outline": "#1D2B78",
-    "grass_hi": "#C4E6CC", "grass": "#96CBA9", "grass_lo": "#6FAE88",
-    "forest": "#5C9A72", "forest_lo": "#4A8460",
-    "sand_hi": "#F2E6BF", "sand": "#E2D09A", "sand_lo": "#C8B37A",
-    "ice_hi": "#FFFFFF", "ice": "#E6EEF9", "ice_lo": "#C3D1EC",
-    "cloud_hi": "#FFFFFF", "cloud": "#DCE7F8", "cloud_lo": "#B7C0F0",
-}
+def noise(i, j):
+    v = (i * 374761393 + j * 668265263) & 0xFFFFFFFF
+    v = ((v ^ (v >> 13)) * 1274126177) & 0xFFFFFFFF
+    return ((v ^ (v >> 16)) & 0xFFFF) / 0xFFFF - .5  # -0.5 .. 0.5
 
-# 1. Sample terrain per pixel (majority of SS x SS subsamples).
-kind = [[None] * W for _ in range(H)]    # None off-disc, "ocean", or terrain
+# Tone ramps, darkest first. Each surface steps along its own ramp.
+RAMPS = {
+    # The Subscribe button's blue (#3B5BDB) with its hover/active shades,
+    # lighter tints for the lit side and the shallows.
+    "ocean":    ["#26399A", "#2F44B0", "#3451C7", "#3B5BDB", "#5874E2", "#7F97EC", "#A7B7F3"],
+    "seaice":   ["#AFC0EA", "#CCD8F2", "#E6EEF9", "#FFFFFF"],
+    "ice":      ["#AFC0EA", "#CCD8F2", "#E6EEF9", "#FFFFFF"],
+    "grass":    ["#5E9E78", "#6FAE88", "#96CBA9", "#B0DABD", "#C9EAD2"],
+    "forest":   ["#3F7656", "#4A8460", "#5C9A72", "#72AE86", "#8CC39D"],
+    "boreal":   ["#335F4B", "#3E7258", "#4F8A6C", "#679F82", "#80B498"],
+    "tundra":   ["#86A58A", "#9DB9A0", "#B5CEB5", "#CADDC8", "#DDEADB"],
+    "savanna":  ["#8E9A5E", "#A3AE6F", "#C3CD8C", "#D4DCA2", "#E3E8BA"],
+    "sand":     ["#B39E66", "#C8B37A", "#E2D09A", "#ECDDB0", "#F5EBCA"],
+    "mountain": ["#77694F", "#8F8261", "#AFA27C", "#C4B893", "#D8CEAE"],
+    "cloud":    ["#9FA9E6", "#B7C0F0", "#DCE6F8", "#F1F5FC", "#FFFFFF"],
+}
+OUTLINE = "#1D2B78"
+
+# 1. Sample the surface per pixel (majority of SS x SS subsamples).
+kind = [[None] * W for _ in range(H)]
 light = [[0.0] * W for _ in range(H)]
 LX, LY, LZ = -0.42, -0.5, 0.76
 ln = math.sqrt(LX * LX + LY * LY + LZ * LZ); LX, LY, LZ = LX / ln, LY / ln, LZ / ln
@@ -122,8 +173,8 @@ for j in range(H):
                 x = (i + (si + .5) / SS - CX) / (D / 2)
                 y = (j + (sj + .5) / SS - CY) / (D / 2)
                 ll = unproject(max(-1, min(1, x)), max(-1, min(1, y)))
-                t = terrain(*ll) if ll else None
-                votes[t or "ocean"] = votes.get(t or "ocean", 0) + 1
+                t = terrain(*ll) if ll else "ocean"
+                votes[t] = votes.get(t, 0) + 1
         kind[j][i] = max(votes, key=votes.get)
         x = (i + .5 - CX) / (D / 2); y = (j + .5 - CY) / (D / 2)
         z = math.sqrt(max(0, 1 - x * x - y * y))
@@ -131,84 +182,105 @@ for j in range(H):
 
 def at(i, j):
     return kind[j][i] if 0 <= i < W and 0 <= j < H else None
+def is_land(k):
+    return k not in (None, "ocean", "seaice")
 
-# 2. Colour: outline on the rim, tone bands with dithered edges inside.
-out = [[None] * W for _ in range(H)]
+# 2. Tone index per pixel: lighting with a dithered edge, a little texture
+# on land, the shallows a step lighter, coasts casting a step of shadow
+# down-right, and a rim of light just inside the lit edge.
+tone = [[None] * W for _ in range(H)]
+rim = [[False] * W for _ in range(H)]
 for j in range(H):
     for i in range(W):
         k = kind[j][i]
         if k is None: continue
-        if any(at(i + di, j + dj) is None for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1))):
-            out[j][i] = "outline"; continue
+        n4 = [at(i + 1, j), at(i - 1, j), at(i, j + 1), at(i, j - 1)]
+        if None in n4:
+            rim[j][i] = True; continue
         b = light[j][i] + dither(i, j) * 0.1
         if k == "ocean":
-            # Drop shadow down-right of any coast.
-            if at(i - 1, j) not in (None, "ocean") or at(i, j - 1) not in (None, "ocean"):
-                out[j][i] = "coast"
-            elif b > 0.96: out[j][i] = "ocean_hi"
-            elif b > 0.82: out[j][i] = "ocean_lt"
-            elif b > 0.5: out[j][i] = "ocean"
-            elif b > 0.24: out[j][i] = "ocean_mid"
-            else: out[j][i] = "ocean_lo"
-        elif k == "forest":
-            out[j][i] = "forest" if b > 0.38 else "forest_lo"
+            t = 5 if b > 0.96 else 4 if b > 0.82 else 3 if b > 0.5 else 2 if b > 0.24 else 1
+            near_land = any(is_land(at(i + di, j + dj)) for di in (-1, 0, 1) for dj in (-1, 0, 1))
+            if is_land(at(i - 1, j)) or is_land(at(i, j - 1)) or is_land(at(i - 1, j - 1)):
+                t = max(0, t - 2)
+            elif near_land:
+                t += 1
         else:
-            out[j][i] = f"{k}_hi" if b > 0.93 else k if b > 0.38 else f"{k}_lo"
+            ramp = len(RAMPS[k])
+            b += noise(i, j) * (0.16 if is_land(k) else 0.06)
+            mid = ramp // 2
+            t = mid + 1 if b > 0.9 else mid if b > 0.45 else mid - 1 if b > 0.18 else mid - 2
+            if ramp == 4:
+                t = min(t, 3)
+        tone[j][i] = max(0, min(len(RAMPS[k]) - 1, t))
 
-# 3. Clouds: '#' lit top, '+' body, '-' underside. Kept inside the rows so
-# the disc still sets the drawing's height (its centre is the SVG's centre).
-CLOUDS = [
-    (0, 7, [
-        "        ###        ",
-        "     ###+++##      ",
-        "   ##++++++++###   ",
-        " ##+++++++++++++#  ",
-        "-----------------  ",
-    ]),
-    (W - 14, 8, [
-        "     ###      ",
-        "   ##+++##    ",
-        " ##+++++++### ",
-        "#++++++++++++#",
-        "--------------",
-    ]),
-    (W - 26, 33, [
-        "          ####         ",
-        "      ####++++##       ",
-        "    ##++++++++++###    ",
-        "  ##+++++++++++++++##  ",
-        "-----------------------",
-    ]),
-]
-# Wisps over the surface: drawn only on the disc's interior, never the rim.
+# Rim light: the pixels just inside the outline on the lit side.
+for j in range(H):
+    for i in range(W):
+        if tone[j][i] is None or rim[j][i]: continue
+        if any(rim[j + dj][i + di] for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1))) and light[j][i] > 0.3:
+            tone[j][i] = min(len(RAMPS[kind[j][i]]) - 1, tone[j][i] + 2)
+
+out = [[None] * W for _ in range(H)]
+for j in range(H):
+    for i in range(W):
+        if kind[j][i] is None: continue
+        out[j][i] = OUTLINE if rim[j][i] else RAMPS[kind[j][i]][tone[j][i]]
+
+# 3. Clouds from overlapping round puffs with a flat base: lit top-left
+# edge, shaded underside. Wisps sit on the surface and cast a shadow.
+def cloud_mask(puffs, base):
+    cells = set()
+    for cx, cy, r in puffs:
+        for j in range(int(cy - r) - 1, int(cy + r) + 2):
+            for i in range(int(cx - r) - 1, int(cx + r) + 2):
+                if j <= base and (i + .5 - cx) ** 2 + (j + .5 - cy) ** 2 <= r * r:
+                    cells.add((i, j))
+    return cells
+
+def paint_cloud(cells, surface):
+    C = RAMPS["cloud"]
+    for (i, j) in cells:
+        if not (0 <= i < W and 0 <= j < H): continue
+        if surface and (kind[j][i] is None or rim[j][i]): continue
+        below = (i, j + 1) in cells
+        if not below:
+            c = C[1]
+        elif (i, j - 1) not in cells or (i - 1, j) not in cells:
+            c = C[4]
+        elif (i + 1, j + 1) not in cells:
+            c = C[2]
+        else:
+            c = C[3]
+        out[j][i] = c
+    if surface:
+        for (i, j) in cells:
+            si, sj = i + 1, j + 2
+            if (si, sj) in cells or not (0 <= si < W and 0 <= sj < H): continue
+            if kind[sj][si] is None or rim[sj][si]: continue
+            out[sj][si] = RAMPS[kind[sj][si]][max(0, tone[sj][si] - 2)]
+
 WISPS = [
-    (19, 17, ["  ###  ", "#####++"]),
-    (24, 29, ["  ##   ", "###+++ "]),
+    ([(33, 27, 1.6), (36, 26, 2.2), (39, 27, 1.6)], 28),
+    ([(47, 43, 1.5), (50, 42, 2.0), (53, 43, 1.5), (55, 43.5, 1.1)], 44),
+    ([(25, 38, 1.2), (27.5, 37.5, 1.6)], 38),
+    ([(56, 23, 1.2), (58.5, 22.5, 1.5)], 23),
 ]
-cmap = {"#": "cloud_hi", "+": "cloud", "-": "cloud_lo"}
-for x0, y0, rows in WISPS:
-    for dy, row in enumerate(rows):
-        for dx, ch in enumerate(row):
-            i, j = x0 + dx, y0 + dy
-            if ch in cmap and out[j][i] not in (None, "outline"):
-                out[j][i] = cmap[ch]
-for x0, y0, rows in CLOUDS:
-    for dy, row in enumerate(rows):
-        for dx, ch in enumerate(row):
-            if ch in cmap and 0 <= x0 + dx < W and 0 <= y0 + dy < H:
-                out[y0 + dy][x0 + dx] = cmap[ch]
-
-SYM = {"ocean_hi": "'", "ocean_lt": ":", "ocean": ".", "ocean_mid": ",", "ocean_lo": ";",
-       "coast": "~", "outline": "@", "grass_hi": "o", "grass": "O", "grass_lo": "0",
-       "forest": "F", "forest_lo": "f", "sand_hi": "s", "sand": "S", "sand_lo": "$",
-       "ice_hi": "I", "ice": "i", "ice_lo": "!", "cloud_hi": "#", "cloud": "+", "cloud_lo": "-"}
-for row in out:
-    print("".join(SYM[c] if c else " " for c in row))
+CLOUDS = [
+    ([(4, 14, 2.4), (8, 12, 3.6), (12.5, 13, 3), (16, 14.5, 2.2)], 16),
+    ([(69, 17, 2.2), (73, 15, 3.4), (77.5, 16, 2.8), (80.5, 17.5, 2)], 18),
+    ([(52, 57, 2.2), (57, 54.5, 3.6), (62, 55.5, 3.2), (66, 57, 2.4)], 58),
+    ([(4, 46, 1.6), (6.5, 44.5, 2.3), (9.5, 46, 1.7)], 47),
+]
+for puffs, base in WISPS:
+    paint_cloud(cloud_mask(puffs, base), surface=True)
+for puffs, base in CLOUDS:
+    paint_cloud(cloud_mask(puffs, base), surface=False)
 
 # Trim empty columns (rows are fixed: the disc spans them all).
+assert any(kind[0]) and any(kind[H - 1]), "the disc must fill the height"
 xs = [i for j in range(H) for i in range(W) if out[j][i]]
 x0, x1 = min(xs), max(xs) + 1
-assert any(kind[0]) and any(kind[H - 1]), "the disc must fill the height"
 
 paths = {}
 for j in range(H):
@@ -221,9 +293,7 @@ for j in range(H):
             paths.setdefault(c, []).append(f"M{i - x0} {j}h{k - i}v1h-{k - i}z")
         i = k
 
-lines = "\n".join(
-    f'      <path fill="{PAL[c]}" d="{"".join(paths[c])}" />' for c in PAL if c in paths
-)
+lines = "\n".join(f'      <path fill="{c}" d="{"".join(d)}" />' for c, d in paths.items())
 tsx = f'''// Generated by scripts/pixel-globe.py; edit that and re-run it, not this.
 // Pixel art: an orthographic view of the Atlantic on a {x1 - x0}x{H} grid, one
 // path per colour. Crisp edges keep the pixels square at any size; size it
@@ -251,4 +321,4 @@ export default function PixelGlobe({{ className = "" }}: PixelGlobeProps) {{
 }}
 '''
 open(sys.argv[1], "w").write(tsx)
-print("canvas", x1 - x0, H, file=sys.stderr)
+print("canvas", x1 - x0, H, "colours", len(paths), file=sys.stderr)
