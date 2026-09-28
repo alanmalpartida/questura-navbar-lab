@@ -32,6 +32,7 @@ src/navbars/
   original/     exact copy of the live navbar. Reference only, don't edit.
   remix-a/      first remix: same code, motion wired to the lab sliders
   atlantic/     Atlantic-style masthead: condenses to a thin bar, hides on scroll down
+  atlantic-q/   Atlantic remix: links bar above the wordmark; scrolls away, then a Q-only bar slides in
   <your-id>/    every folder with a Navbar.tsx becomes a tab automatically
 src/lab/        lab chrome (tab bar, compare view, tuning) + stubs for app pieces
 src/page/       the long fake city page the navbar scrolls over
