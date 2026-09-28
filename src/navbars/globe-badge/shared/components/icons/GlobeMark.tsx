@@ -7,9 +7,8 @@ interface GlobeMarkProps {
 }
 
 /**
- * A small vector globe matching the join page's hero globe: North America at
- * night-dark navy with slate land, soft cloud, a teal rim and the page's
- * glowing cyan hub cities. Gradient ids are
+ * A small vector globe in the join page's hero-globe colours: North America,
+ * night-dark navy ocean, slate land, faint cloud and a teal rim. Gradient ids are
  * per instance; the navbar renders desktop and mobile copies at once, and a
  * shared id would resolve to whichever copy is hidden.
  */
@@ -19,31 +18,27 @@ export default function GlobeMark({ className = "" }: GlobeMarkProps) {
   const shade = `${id}-shade`;
   const ground = `${id}-land`;
   const glint = `${id}-glint`;
-  const glow = `${id}-glow`;
   const soft = `${id}-soft`;
 
   return (
     <svg viewBox="0 0 64 64" aria-hidden className={className}>
       <defs>
         <radialGradient id={ocean} cx="36%" cy="30%" r="75%">
-          <stop offset="0%" stopColor="#233A5E" />
-          <stop offset="50%" stopColor="#10264A" />
-          <stop offset="100%" stopColor="#04152A" />
+          <stop offset="0%" stopColor="#1A2B46" />
+          <stop offset="50%" stopColor="#0B1F3C" />
+          <stop offset="100%" stopColor="#03111F" />
         </radialGradient>
         <radialGradient id={ground} cx="36%" cy="30%" r="80%">
-          <stop offset="0%" stopColor="#67676A" />
-          <stop offset="45%" stopColor="#4B5053" />
-          <stop offset="80%" stopColor="#2E3F45" />
-          <stop offset="100%" stopColor="#1C2C34" />
+          <stop offset="0%" stopColor="#4A4B4E" />
+          <stop offset="45%" stopColor="#3A4046" />
+          <stop offset="80%" stopColor="#26353D" />
+          <stop offset="100%" stopColor="#17252D" />
         </radialGradient>
         <radialGradient id={glint} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.5" />
+          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.3" />
           <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
         </radialGradient>
-        <radialGradient id={glow}>
-          <stop offset="0%" stopColor="#4EE8D8" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#4EE8D8" stopOpacity="0" />
-        </radialGradient>
+
         <filter id={soft} x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="1.3" />
         </filter>
@@ -56,22 +51,14 @@ export default function GlobeMark({ className = "" }: GlobeMarkProps) {
       </defs>
       <circle cx="32" cy="32" r="32" fill={`url(#${ocean})`} />
       <path fill={`url(#${ground})`} d="M42 35.7L44.2 36L42.7 36.9L41.2 36.7L42.2 36.4L41.7 35.7ZM38.3 34.6L41.2 35.6L40.8 35.9L39.4 36.1L39.7 35.8L38.8 35.2L37.2 34.8L35.6 35.3L37.8 34.5ZM43.9 17.9L43.9 18.3L45 18.3L45.8 19.5L45.2 19.1L45 19.6L43.7 19.7L43.9 17.5ZM48.7 8L52 9.4L52.6 10.9L48.7 8.2ZM44.5 7.4L45.7 8.6L44.2 8.6L44.4 7.5ZM63.8 28.2L63.6 31.4L61.8 28.7L59.7 20.2L57.9 16.3L58.2 15.8L56.9 12.3L58.6 14.2L61.3 19.1L63.7 27.6ZM50.4 5.8L56.1 11L54.5 10.2L57.7 15.2L57.9 16.1L57.5 16L57.4 16.5L55.2 14.1L55 12.2L53.1 11.2L50.7 7.7L48.7 6.4L50.3 7.2L49.3 5.8L45.7 3.6L46.4 4.4L43.8 3.4L49 6L49.6 6.6L47.9 6L48.7 6.8L48 6.6L40.9 2.8L41.4 2.7L41 2L43 2.5L36 0.5L34.5 0.7L35.7 0.3L24.8 1.7L21.3 4L20.5 4.9L21.2 4.8L21 5.3L19.3 7.5L18.3 7.6L18.9 6.4L17.1 7.1L16.1 6.6L16.4 5.7L13.2 6.6L15.7 5.3L17.7 5.3L17 5.1L17.7 4.6L16.9 4.7L18.5 3L15.4 4.6L21.5 1.8L25.8 0.6L31.3 0L35.8 0.2L41.2 1.4L45.4 2.9L50.3 5.7ZM32.3 10.8L33 11.8L33.2 10.6L33.8 10.7L34.3 11.7L33.4 12L31.4 14.6L31.2 15.5L31.9 16.4L35.1 17.3L36.2 19.2L36.5 18.5L35.9 17.4L36.7 16.4L35.9 15.4L35.6 13.8L37.9 14L39 15.2L39.3 14L40.9 15.7L42.5 16.1L43.6 17.1L42.8 18.4L40.8 19L39.8 21L41.5 19.3L42.2 20.8L43.3 20.7L43.4 20.1L43.9 20.5L42.4 22.3L42 21.9L42.4 21.3L40.6 22.6L41 23.6L39.6 24.3L40.3 24.2L39.5 24.4L39.3 25.4L39 25.1L39 26.4L38.7 25.4L39.3 27.3L37.1 29.9L37.8 33.3L37.1 33L35.8 30.7L33.4 30.7L32.9 31.4L31.1 31L29.5 32L29 35L29.9 37.1L30.7 37.5L32.3 37.1L32.9 35.9L34.6 35.5L33.6 38.7L36.6 38.9L36.5 41.2L37.4 42.2L38.8 41.7L40.3 42.1L41.2 40.7L42.8 39.7L43 41.5L43.7 39.7L44.7 40.3L47.8 39.5L47.6 40L50.2 41.3L51.6 40.9L52.8 41.3L53.4 42.3L53.1 43.2L54 43L54 43.5L54.8 43L55.4 43L55.5 43.5L57.2 42.6L58.6 42.9L58.5 44.5L54.6 51.9L48.3 57.7L46.7 58.2L46.9 58.6L46.2 59.2L39.9 62.8L37.7 63.1L39.8 61.5L39.1 61.8L41.5 59L43.2 54.7L42.7 53.9L40.5 53.1L38.7 50.1L37.9 49.7L38.8 48L38.1 47.8L38.1 47.3L40.2 44.6L40 43.2L39 42L38.4 43L37 42.7L35.5 41.8L34.4 40.1L32.4 39.8L30.6 38.5L29.6 38.8L25.9 37.1L25 36.1L24.8 34.5L21.5 28.9L21.3 29.8L23.2 34L22.9 34.2L20.9 31.1L21.4 30.7L20.5 28L19.4 26.8L18.9 24.2L20.5 19.4L20.9 20.1L21.2 19.6L20.3 17.8L20.7 13.9L19.2 11.5L17.8 11.6L18.9 11L15.6 11.9L14.2 11.6L17 11.1L16.4 10.5L16.9 9.5L18.2 8.8L18.8 9.1L19.3 8.8L18.8 8.4L19.2 7.7L19.8 8.3L20.9 7.1L22.8 7.3L23.9 9.5L25.7 9.4L27.5 11.2L30.8 11.2L31.1 11.7L31.4 9.8L31.9 10.7ZM28.5 9L29.2 9.7L29.7 9.2L30.2 10.7L27.7 10.8L27.3 10.1L28.2 10.1L27.3 9.9L27.8 9.6L27.3 9.4L28.4 8.9ZM32.9 9.3L33.5 9L33.9 9.7L35.4 9.7L36.4 10.1L36.6 10.7L38.3 11.1L38.4 12L37.2 11.7L38.6 12.7L37.6 12.8L38.6 13.4L35.2 12.8L36.1 12.2L36.1 11.4L34.5 10.4L32.6 10.4L32.3 9.7L33 9ZM27.1 9.4L26.4 9L27.8 8.3L28.4 8.8L27.2 9.3ZM33.5 5.6L34.1 5.7L33.5 8.1L32.3 8L32.8 7.6L32.5 6.7L32.9 6.6L32 6.1L33.4 5.6ZM35.3 4.6L35.8 4.6L35.9 5L36.8 4.5L42 7L41.3 7.1L41.9 7.5L42.2 7.2L42.5 10.1L43.7 12.6L42.4 12.5L40 10.9L39.2 9.3L39.1 9.7L38.5 9.4L38.9 9.1L36.4 7.8L35.1 7.9L34.5 7.6L35 7.4L34.1 7.3L34.6 6.7L34.3 5.8L35.4 5.5L35 4.8Z" />
-      <g fill="#C9D3D8" opacity="0.32" filter={`url(#${soft})`}>
+      <g fill="#C9D3D8" opacity="0.22" filter={`url(#${soft})`}>
         <ellipse cx="14" cy="22" rx="5" ry="2" transform="rotate(-35 14 22)" />
         <ellipse cx="50" cy="26" rx="4.5" ry="1.8" transform="rotate(18 50 26)" />
         <ellipse cx="44" cy="50" rx="5.5" ry="1.8" transform="rotate(-10 44 50)" />
       </g>
       <circle cx="38" cy="58" r="3" fill={`url(#${glint})`} />
       <circle cx="32" cy="32" r="32" fill={`url(#${shade})`} />
-      <circle cx="32" cy="32" r="31.3" fill="none" stroke="#2DA0CF" strokeOpacity="0.45" strokeWidth="1.3" />
-        <circle cx="39.5" cy="24.4" r="4.6" fill={`url(#${glow})`} />
-        <circle cx="39.5" cy="24.4" r="1.9" fill="#7DF0E2" />
-        <circle cx="37.9" cy="32.9" r="4.6" fill={`url(#${glow})`} />
-        <circle cx="37.9" cy="32.9" r="1.9" fill="#7DF0E2" />
-        <circle cx="29.7" cy="29.3" r="4.6" fill={`url(#${glow})`} />
-        <circle cx="29.7" cy="29.3" r="1.9" fill="#7DF0E2" />
-        <circle cx="20.3" cy="27.3" r="4.6" fill={`url(#${glow})`} />
-        <circle cx="20.3" cy="27.3" r="1.9" fill="#7DF0E2" />
+      <circle cx="32" cy="32" r="31.3" fill="none" stroke="#2DA0CF" strokeOpacity="0.3" strokeWidth="1.2" />
     </svg>
   );
 }
