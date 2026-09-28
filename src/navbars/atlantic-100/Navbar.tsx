@@ -31,6 +31,21 @@ export default function Navbar() {
   // A slider move changes where the collapse should be without a scroll event.
   useEffect(() => resyncRef.current(), [tuning.collapsePx]);
 
+  // The navbar is in flow and changes height as it collapses. With the
+  // browser's scroll anchoring on, every height change nudges scrollY to keep
+  // the content still, which changes the collapse target, which changes the
+  // height again: on a slow scroll back up the bar bounced a few px per frame
+  // (and the rules flickered with it). The collapse already accounts for the
+  // height change, so anchoring is switched off while this navbar is mounted.
+  useEffect(() => {
+    const root = document.documentElement.style;
+    const prev = root.overflowAnchor;
+    root.overflowAnchor = "none";
+    return () => {
+      root.overflowAnchor = prev;
+    };
+  }, []);
+
   useEffect(() => {
     const collapseFromScroll = () =>
       Math.min(1, Math.max(0, window.scrollY / tuningRef.current.collapsePx));

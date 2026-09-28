@@ -41,9 +41,12 @@ export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
       <div
         className="w-full px-6"
         style={{
-          // 28px (masthead) → 10px (thin bar).
-          paddingTop: "calc(28px - var(--navbar-collapse, 0) * 18px)",
-          paddingBottom: "calc(20px - var(--navbar-collapse, 0) * 10px)",
+          // 28px (masthead) → 10px (thin bar). Every animated height here
+          // is rounded to a whole pixel: fractional heights left the rules
+          // sitting between pixel rows, so they wobbled 1px and looked
+          // thicker/thinner from frame to frame.
+          paddingTop: "round(calc(28px - var(--navbar-collapse, 0) * 18px), 1px)",
+          paddingBottom: "round(calc(20px - var(--navbar-collapse, 0) * 10px), 1px)",
         }}
       >
         <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-3">
@@ -77,7 +80,10 @@ export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
           <Link
             href="/"
             data-no-hover-underline
-            className="cursor-pointer justify-self-center"
+            className="flex cursor-pointer items-center justify-self-center"
+            // The wordmark's line box is as tall as its (fractional) font
+            // size; pin the box to the nearest whole pixel.
+            style={{ height: "round(calc(3.4rem - var(--navbar-collapse, 0) * 1.85rem), 1px)" }}
           >
             <Logo />
           </Link>
@@ -112,7 +118,7 @@ export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
       <div
         className="relative overflow-hidden"
         style={{
-          height: "calc(44px - var(--navbar-collapse, 0) * 44px)",
+          height: "round(calc(44px - var(--navbar-collapse, 0) * 44px), 1px)",
           opacity: "calc(1 - var(--navbar-collapse, 0) * 1.5)",
         }}
       >
