@@ -92,14 +92,13 @@ export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
         </div>
       </div>
 
-      {/* Section row, between two rules: a divider on top and the bar's own
-          bottom rule. As the row shrinks the two close in like a zip, the
-          links (centred, so clipped from both sides) fade as they're
-          squeezed, and when the row reaches zero height the divider is
-          clipped away exactly where it meets the bottom rule: two lines
-          become one. */}
+      {/* Section row, between the divider on top and the bar's own bottom
+          rule. The row shrinks from the bottom only: the links stay pinned
+          to the divider and the bottom rule climbs up over them, fading them
+          as it goes. At zero height the divider is clipped exactly where the
+          bottom rule reaches it, leaving one line under the thin bar. */}
       <div
-        className="relative flex items-center overflow-hidden"
+        className="relative overflow-hidden"
         style={{ height: "calc(44px - var(--navbar-collapse, 0) * 44px)" }}
       >
         <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-black/[0.14]" />
