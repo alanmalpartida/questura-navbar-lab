@@ -3,7 +3,6 @@ import {
   AuthSlot,
   MenuIcon,
   Logo,
-  SearchIcon,
   SubscribeButton,
 } from "../shared/components";
 
@@ -43,13 +42,8 @@ export default function DesktopNavbar() {
         }}
       >
         <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-3">
-          <div className="flex items-center gap-5 justify-self-start">
-            <MenuIcon
-              iconClassName="!text-black h-[22px] w-[22px]"
-              label="Menu"
-              labelClassName="text-[0.8rem] font-medium tracking-[0.02em] text-black"
-            />
-            <SearchIcon iconClassName="h-[19px] w-[19px] text-black" />
+          <div className="justify-self-start">
+            <MenuIcon iconClassName="!text-black h-6 w-6" />
           </div>
           <Link
             href="/"
