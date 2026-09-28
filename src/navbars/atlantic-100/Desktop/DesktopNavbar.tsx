@@ -14,7 +14,12 @@ const SECTIONS = [
   { label: "Newsletters", href: "/newsletters" },
 ];
 
-export default function DesktopNavbar() {
+interface DesktopNavbarProps {
+  /** Fully collapsed: the section links show in the thin bar. */
+  locked: boolean;
+}
+
+export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
   const { user, loading, isAuthenticated } = useAuth();
   const { isActive } = useMembership(user);
   const shouldShowSubscribe = !isAuthenticated || !isActive;
@@ -39,8 +44,25 @@ export default function DesktopNavbar() {
         }}
       >
         <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-3">
-          <div className="justify-self-start">
+          <div className="flex items-center gap-8 justify-self-start">
             <MenuIcon iconClassName="!text-black h-6 w-6" />
+            {/* The section links again, in the thin bar: they slide in once
+                the bar has fully collapsed and out as soon as it expands.
+                Newsletters only fits beside the wordmark from 1280px. */}
+            <ul
+              inert={!locked}
+              className={`flex items-center gap-6 font-[family-name:var(--font-dm-sans)] text-[0.74rem] font-semibold uppercase tracking-[0.14em] text-[#25292d] transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none ${
+                locked ? "translate-x-0 opacity-100" : "pointer-events-none -translate-x-2 opacity-0"
+              }`}
+            >
+              {SECTIONS.map((s) => (
+                <li key={s.href} className={s.href === "/newsletters" ? "hidden 1280:list-item" : ""}>
+                  <Link href={s.href} className="whitespace-nowrap hover:text-[#3B5BDB]">
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
           <Link
             href="/"

@@ -1,17 +1,20 @@
 // Remix of questura client: features/Navigation/Navbar.tsx
 // Atlantic-style: a tall masthead that condenses into a thin bar over the
 // first collapsePx of scroll (same --navbar-collapse lerp as the original)
-// and stays pinned at the top from then on.
+// and stays pinned at the top from then on. Once it has fully collapsed, the
+// section links slide into the thin bar beside the menu (Atlantic 3's trick).
 // Motion constants come from the lab panel sliders (useTuning) so they can be
 // tuned live; bake the final numbers back in when porting to Questura.
 
 import DesktopNavbar from "./Desktop/DesktopNavbar";
 import MobileNavbar from "./Mobile/MobileNavbar";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTuning } from "@lab/LabContext";
 
 export default function Navbar() {
   const navRef = useRef<HTMLElement>(null);
+  // True once the rendered collapse has settled at 1.
+  const [locked, setLocked] = useState(false);
 
   // collapsePx: scroll distance over which the navbar goes expanded → collapsed.
   // lerp: how fast the rendered value chases the target each frame.
@@ -36,6 +39,7 @@ export default function Navbar() {
       if (targetVal === 1 && currentVal > 0.995) currentVal = 1;
       if (targetVal === 0 && currentVal < 0.005) currentVal = 0;
 
+      setLocked(currentVal === 1);
       const borderAlpha = currentVal === 0 || currentVal === 1 ? 0.1 : 0;
       document.documentElement.style.setProperty(
         "--navbar-collapse",
@@ -95,7 +99,7 @@ export default function Navbar() {
   return (
     <nav ref={navRef} className="sticky top-0 z-40">
       <div className="hidden 1024:block">
-        <DesktopNavbar />
+        <DesktopNavbar locked={locked} />
       </div>
       <div className="h-[55px] 1024:hidden">
         <MobileNavbar />
