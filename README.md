@@ -39,6 +39,7 @@ src/navbars/
   globe-badge/  atlantic-100 with a small vector globe in the member badge instead of the Q
   <your-id>/    every folder with a Navbar.tsx becomes a tab automatically
 src/lab/        lab chrome (tab bar, compare view, tuning) + stubs for app pieces
+handoffs/       ready-to-port changes for Questura, each with its own README
 src/page/       the long fake city page the navbar scrolls over
 ```
 
