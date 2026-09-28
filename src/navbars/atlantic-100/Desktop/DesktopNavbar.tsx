@@ -26,7 +26,7 @@ export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
 
   return (
     <div
-      className="w-full border-b bg-[#faf7f2]"
+      className="w-full border-b bg-[#F5F0E8]"
       style={{
         // One constant bottom rule. As the bar shrinks it rises over the
         // section row and eats it from the bottom up.

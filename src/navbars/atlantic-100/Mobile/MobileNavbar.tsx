@@ -7,7 +7,7 @@ export default function MobileNavbar() {
   const shouldShowSubscribe = !isAuthenticated || !isActive;
 
   return (
-    <nav className="h-[55px] min-h-[55px] w-full border-b border-black/10 bg-[#faf7f2] px-4 py-0">
+    <nav className="h-[55px] min-h-[55px] w-full border-b border-black/10 bg-[#F5F0E8] px-4 py-0">
       <div className="flex h-[55px] min-h-[55px] items-center justify-between gap-3 max-[379.98px]:gap-2.5">
         <div className="flex min-h-8 min-w-0 flex-1 items-center gap-2 max-[379.98px]:gap-2.5">
           <MenuIcon
