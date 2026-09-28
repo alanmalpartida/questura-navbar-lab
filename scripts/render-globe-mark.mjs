@@ -11,7 +11,10 @@ import { join } from "node:path";
 import { geoOrthographic, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 
-const LON0 = -28, LAT0 = 22;     // same view as atlantic-4's globe
+// Same view and palette as the join page's hero globe (Questura
+// features/Payments, questurian-globe-*.webp): the Americas, a deep navy
+// ocean, muted olive/khaki land, soft cloud and a sun glint.
+const LON0 = -78, LAT0 = 14;
 const MIN_AREA = 1.2;            // viewBox units^2; smaller islands are dropped
 // Every variant whose member badge shows the globe.
 const VARIANTS = ["atlantic-100", "atlantic-150", "globe-badge"];
@@ -81,8 +84,8 @@ interface GlobeMarkProps {
 }
 
 /**
- * A small vector globe: the Atlantic, lit from the top left. The ocean is the
- * navy of the badge it replaced (#1e3599 to #05092e), darker than Subscribe. Gradient ids are
+ * A small vector globe matching the join page's hero globe: the Americas, a
+ * deep navy ocean, olive/khaki land, soft cloud, a sun glint. Gradient ids are
  * per instance; the navbar renders desktop and mobile copies at once, and a
  * shared id would resolve to whichever copy is hidden.
  */
@@ -90,15 +93,31 @@ export default function GlobeMark({ className = "" }: GlobeMarkProps) {
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const ocean = \`\${id}-ocean\`;
   const shade = \`\${id}-shade\`;
+  const ground = \`\${id}-land\`;
+  const glint = \`\${id}-glint\`;
+  const soft = \`\${id}-soft\`;
 
   return (
     <svg viewBox="0 0 64 64" aria-hidden className={className}>
       <defs>
         <radialGradient id={ocean} cx="36%" cy="30%" r="75%">
-          <stop offset="0%" stopColor="#2A45B0" />
-          <stop offset="50%" stopColor="#1A2D86" />
-          <stop offset="100%" stopColor="#05092E" />
+          <stop offset="0%" stopColor="#1C4C9E" />
+          <stop offset="50%" stopColor="#0A3478" />
+          <stop offset="100%" stopColor="#051A4C" />
         </radialGradient>
+        <radialGradient id={ground} cx="36%" cy="30%" r="80%">
+          <stop offset="0%" stopColor="#ABA086" />
+          <stop offset="45%" stopColor="#8A8B6C" />
+          <stop offset="80%" stopColor="#66735A" />
+          <stop offset="100%" stopColor="#4B5A4A" />
+        </radialGradient>
+        <radialGradient id={glint} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.85" />
+          <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+        </radialGradient>
+        <filter id={soft} x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="1.3" />
+        </filter>
         <radialGradient id={shade} cx="34%" cy="28%" r="80%">
           <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.16" />
           <stop offset="35%" stopColor="#FFFFFF" stopOpacity="0" />
@@ -107,9 +126,15 @@ export default function GlobeMark({ className = "" }: GlobeMarkProps) {
         </radialGradient>
       </defs>
       <circle cx="32" cy="32" r="32" fill={\`url(#\${ocean})\`} />
-      <path fill="#8FC49F" d="${d}" />
+      <path fill={\`url(#\${ground})\`} d="${d}" />
+      <g fill="#FFFFFF" opacity="0.42" filter={\`url(#\${soft})\`}>
+        <ellipse cx="45" cy="21" rx="4.5" ry="1.8" transform="rotate(14 45 21)" />
+        <ellipse cx="16" cy="43" rx="5.5" ry="2" transform="rotate(-30 16 43)" />
+        <ellipse cx="31" cy="52" rx="6" ry="2" transform="rotate(-6 31 52)" />
+      </g>
+      <circle cx="30" cy="36" r="3" fill={\`url(#\${glint})\`} />
       <circle cx="32" cy="32" r="32" fill={\`url(#\${shade})\`} />
-      <circle cx="32" cy="32" r="31.2" fill="none" stroke="#7F93D8" strokeOpacity="0.3" strokeWidth="1.4" />
+      <circle cx="32" cy="32" r="31.4" fill="none" stroke="#8FB0EA" strokeOpacity="0.3" strokeWidth="1" />
     </svg>
   );
 }
