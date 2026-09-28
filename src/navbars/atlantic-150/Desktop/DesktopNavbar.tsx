@@ -20,11 +20,9 @@ const LINKS_IN_FROM = 0.7;
 interface DesktopNavbarProps {
   /** Fully collapsed: the section links show in the thin bar. */
   locked: boolean;
-  /** Fully expanded and still: the divider above the section row shows. */
-  atRest: boolean;
 }
 
-export default function DesktopNavbar({ locked, atRest }: DesktopNavbarProps) {
+export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
   const { user, loading, isAuthenticated } = useAuth();
   const { isActive } = useMembership(user);
   const shouldShowSubscribe = !isAuthenticated || !isActive;
@@ -104,12 +102,13 @@ export default function DesktopNavbar({ locked, atRest }: DesktopNavbarProps) {
         </div>
       </div>
 
-      {/* Section row. At rest a divider sits on top of it; the moment a
-          scroll starts the divider fades out quickly, so only one rule is
-          ever moving: the bar's bottom rule, which climbs over the row as it
-          shrinks from the bottom (links anchored to the top) and fades them
-          as it covers them. The divider fades back once the bar is fully
-          expanded again. */}
+      {/* Section row. A divider sits on top of it when the bar is fully
+          expanded and fades out over the first 1/8 of the collapse, so by
+          the time anything visibly moves only one rule is left: the bar's
+          bottom rule, which climbs over the row as it shrinks from the
+          bottom (links anchored to the top) and fades them as it covers
+          them. Scroll-linked like everything else, so it comes back over
+          the last 1/8 of the expand, in step with the wordmark. */}
       <div
         className="relative overflow-hidden"
         style={{
@@ -119,9 +118,8 @@ export default function DesktopNavbar({ locked, atRest }: DesktopNavbarProps) {
       >
         <div
           aria-hidden
-          className={`absolute inset-x-0 top-0 h-px bg-white/[0.14] transition-opacity duration-200 ease-out motion-reduce:transition-none ${
-            atRest ? "opacity-100" : "opacity-0"
-          }`}
+          className="absolute inset-x-0 top-0 h-px bg-white/[0.14]"
+          style={{ opacity: "calc(1 - var(--navbar-collapse, 0) * 8)" }}
         />
         <ul className="flex h-[44px] items-center justify-center gap-8 px-6 font-[family-name:var(--font-dm-sans)] text-[0.74rem] font-semibold uppercase tracking-[0.14em] text-[#e8e3da]">
           {SECTIONS.map((s) => (
