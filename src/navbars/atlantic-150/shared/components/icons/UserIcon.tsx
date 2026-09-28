@@ -40,11 +40,11 @@ export default function UserIcon({ buttonClassName = "", isMember = false }: Use
             </span>
           </span>
         ) : (
-          <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-[#f5f3ef] to-[#e0dcd6] ring-1 ring-black/[0.04] 480:h-[28px] 480:w-[28px]">
+          <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-[#4a4d52] to-[#383b40] ring-1 ring-white/[0.08] 480:h-[28px] 480:w-[28px]">
             <User
               aria-hidden
               strokeWidth={1.75}
-              className="h-[9px] w-[9px] text-stone-900 480:h-[11px] 480:w-[11px]"
+              className="h-[9px] w-[9px] text-[#e8e3da] 480:h-[11px] 480:w-[11px]"
             />
           </span>
         )}
