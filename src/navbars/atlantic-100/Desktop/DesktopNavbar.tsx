@@ -14,6 +14,9 @@ const SECTIONS = [
   { label: "Newsletters", href: "/newsletters" },
 ];
 
+// Collapse progress at which the thin-bar links start coming in.
+const LINKS_IN_FROM = 0.7;
+
 interface DesktopNavbarProps {
   /** Fully collapsed: the section links show in the thin bar. */
   locked: boolean;
@@ -46,14 +49,21 @@ export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
         <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-3">
           <div className="flex items-center gap-8 justify-self-start">
             <MenuIcon iconClassName="!text-black h-6 w-6" />
-            {/* The section links again, in the thin bar: they slide in once
-                the bar has fully collapsed and out as soon as it expands.
+            {/* The section links again, in the thin bar. Part of the scroll
+                animation itself, not a timed fade: over the last 30% of the
+                collapse they drop in from 8px above and fade up, landing
+                exactly as the wordmark reaches its final size (and leaving
+                the same way on the way back). Clickable once locked.
                 Newsletters only fits beside the wordmark from 1280px. */}
             <ul
               inert={!locked}
-              className={`flex items-center gap-6 font-[family-name:var(--font-dm-sans)] text-[0.74rem] font-semibold uppercase tracking-[0.14em] text-[#25292d] transition-[opacity,transform] duration-150 ease-out motion-reduce:transition-none ${
-                locked ? "translate-x-0 opacity-100" : "pointer-events-none -translate-x-2 opacity-0"
+              className={`flex items-center gap-6 font-[family-name:var(--font-dm-sans)] text-[0.74rem] font-semibold uppercase tracking-[0.14em] text-[#25292d] ${
+                locked ? "" : "pointer-events-none"
               }`}
+              style={{
+                opacity: `calc((var(--navbar-collapse, 0) - ${LINKS_IN_FROM}) / ${1 - LINKS_IN_FROM})`,
+                transform: `translateY(calc(clamp(0, (1 - var(--navbar-collapse, 0)) / ${1 - LINKS_IN_FROM}, 1) * -8px))`,
+              }}
             >
               {SECTIONS.map((s) => (
                 <li key={s.href} className={s.href === "/newsletters" ? "hidden 1280:list-item" : ""}>
