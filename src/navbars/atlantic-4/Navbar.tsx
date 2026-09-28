@@ -18,10 +18,9 @@
 // everything is a calc() off --navbar-collapse:
 //   --row    top-row height (its controls are centred in it)
 //   --bar    locked bar height; also where the rule ends up
-//   --line0  where the rule starts
 //   --d      scroll distance to lock (spacer = --bar + --d)
 //   --g      globe height; kept to whole multiples of its 32px pixel grid
-//   --gy0    globe centre
+//   --gy0    globe centre; the rule starts here, through the middle of the disc
 //   --gfade  how fast the globe fades as it goes: on phones it passes the
 //            account controls, so it is gone a quarter of the way in
 //   --ty0    wordmark centre, expanded (locked centre is --bar / 2)
@@ -83,14 +82,14 @@ export default function Navbar() {
     <div
       ref={wrapRef}
       className="
-        [--row:64px] [--bar:55px] [--line0:110px] [--d:109px]
+        [--row:64px] [--bar:55px] [--d:109px]
         [--g:64px] [--gy0:90px] [--gfade:4] [--ty0:141px] [--fs:1.02rem]
         [--x1:56px] [--tx1:50%]
         480:[--fs:1.35rem] 480:[--ty0:144px] 480:[--d:115px]
-        1024:[--row:112px] 1024:[--bar:64px] 1024:[--line0:118px] 1024:[--d:136px]
+        1024:[--row:112px] 1024:[--bar:64px] 1024:[--d:136px]
         1024:[--g:96px] 1024:[--gy0:88px] 1024:[--gfade:0] 1024:[--ty0:166px] 1024:[--fs:1.9rem]
         1024:[--x1:50%] 1024:[--tx1:0%]
-        1280:[--row:120px] 1280:[--line0:138px] 1280:[--d:164px]
+        1280:[--row:120px] 1280:[--d:164px]
         1280:[--g:128px] 1280:[--gy0:100px] 1280:[--ty0:194px]
       "
     >
@@ -109,11 +108,11 @@ export default function Navbar() {
           <MobileNavbar locked={locked} />
         </div>
 
-        {/* The rule: starts through the globe, ends under the locked bar. */}
+        {/* The rule: starts through the globe's centre, ends under the locked bar. */}
         <div
           aria-hidden
           className="absolute inset-x-0 h-px bg-black/45"
-          style={{ top: `calc(var(--line0) - ${c} * (var(--line0) - var(--bar)) - 1px)` }}
+          style={{ top: `calc(var(--gy0) - ${c} * (var(--gy0) - var(--bar)) - 1px)` }}
         />
 
         {/* The globe scrolls away with the page, clearing the top edge exactly
