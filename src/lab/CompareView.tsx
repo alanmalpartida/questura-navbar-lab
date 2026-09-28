@@ -1,12 +1,12 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowLeft, Link2, Link2Off } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, Link2, Link2Off } from "lucide-react";
 import { useLab } from "./LabContext";
-import { AUTH_MODES, Divider, Segmented, chromeText } from "./ui";
+import { AUTH_MODES, Divider, Select, chromeText } from "./ui";
 import { lastViewedVariant, variants } from "../navbars/registry";
 
 /**
- * Every variant at once, each in its own iframe so each gets its own scroll
- * position, its own --navbar-* variables and its own media queries (a
+ * Two variants side by side, each in its own iframe so each gets its own
+ * scroll position, its own --navbar-* variables and its own media queries (a
  * phone-width frame really renders the mobile navbar).
  */
 
@@ -20,11 +20,29 @@ type WidthId = (typeof WIDTHS)[number]["id"];
 
 const MIN_SCALE = 0.4;
 const GAP = 16;
+const PAIR_KEY = "navbar-lab:compare-pair";
+
+// Last pair compared, if both still exist; otherwise the variant you came
+// from next to the original (or the next variant, if you came from it).
+function initialPair(): [string, string] {
+  const ids = variants.map((v) => v.id);
+  try {
+    const saved = JSON.parse(localStorage.getItem(PAIR_KEY) ?? "null");
+    if (Array.isArray(saved) && saved.length === 2 && saved.every((id) => ids.includes(id)) && saved[0] !== saved[1]) {
+      return [saved[0], saved[1]];
+    }
+  } catch {
+    /* no storage: fall through */
+  }
+  const left = lastViewedVariant() ?? ids[0];
+  const right = left !== "original" && ids.includes("original") ? "original" : ids.find((id) => id !== left) ?? left;
+  return [left, right];
+}
 
 export default function CompareView() {
   const { auth, setAuth, tuning, showGuides } = useLab();
   const [width, setWidth] = useState<WidthId>("1440");
-  const [shown, setShown] = useState<string[]>(() => variants.map((v) => v.id));
+  const [pair, setPair] = useState<[string, string]>(initialPair);
   const [sync, setSync] = useState(true);
   const stageRef = useRef<HTMLDivElement>(null);
   const [stage, setStage] = useState({ w: 0, h: 0 });
@@ -44,8 +62,26 @@ export default function CompareView() {
     return () => ro.disconnect();
   }, []);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(PAIR_KEY, JSON.stringify(pair));
+    } catch {
+      /* ignore */
+    }
+  }, [pair]);
+
+  // Picking the variant already on the other side swaps the two.
+  const pick = (side: 0 | 1, id: string) =>
+    setPair(([l, r]) => {
+      const next: [string, string] = [l, r];
+      if (next[1 - side] === id) next[1 - side] = next[side];
+      next[side] = id;
+      return next;
+    });
+  const variantOptions = variants.map((v) => ({ id: v.id, label: v.name, title: v.description }));
+
   const frameW = Number(width);
-  const cols = variants.filter((v) => shown.includes(v.id));
+  const cols = pair.map((id) => variants.find((v) => v.id === id)!).filter(Boolean);
   const fitW = (stage.w - GAP * Math.max(0, cols.length - 1)) / Math.max(1, cols.length);
   const scale = Math.min(1, Math.max(MIN_SCALE, fitW / frameW));
   const labelH = 28;
@@ -68,36 +104,32 @@ export default function CompareView() {
           onClick={() => (window.location.hash = lastViewedVariant() ?? "")}
           className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1.5 text-white/80 hover:bg-white/10 hover:text-white"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Single view
+          <ArrowLeft className="h-3.5 w-3.5" /> Back
         </button>
         <Divider />
-        <Segmented label="Frame width" options={[...WIDTHS]} value={width} onChange={setWidth} />
+        <Select label="Left variant" options={variantOptions} value={pair[0]} onChange={(id) => pick(0, id)} />
+        <button
+          onClick={() => setPair(([l, r]) => [r, l])}
+          className="shrink-0 cursor-pointer rounded-md p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
+          aria-label="Swap sides"
+          title="Swap sides"
+        >
+          <ArrowLeftRight className="h-3.5 w-3.5" />
+        </button>
+        <Select label="Right variant" options={variantOptions} value={pair[1]} onChange={(id) => pick(1, id)} />
         <Divider />
-        <Segmented label="Auth state" options={AUTH_MODES} value={auth} onChange={setAuth} />
-        <Divider />
+        <Select label="Frame width" options={[...WIDTHS]} value={width} onChange={setWidth} />
+        <Select label="Auth state" prefix="Auth" options={AUTH_MODES} value={auth} onChange={setAuth} />
         <button
           onClick={() => setSync((s) => !s)}
           aria-pressed={sync}
           className={`flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1.5 ${
             sync ? "bg-white/15 text-white" : "text-white/70 hover:bg-white/10"
           }`}
-          title="Scroll one frame, the others follow"
+          title="Scroll one frame, the other follows"
         >
-          {sync ? <Link2 className="h-3.5 w-3.5" /> : <Link2Off className="h-3.5 w-3.5" />} Sync scroll
+          {sync ? <Link2 className="h-3.5 w-3.5" /> : <Link2Off className="h-3.5 w-3.5" />} Sync
         </button>
-        <Divider />
-        {variants.map((v) => (
-          <label key={v.id} className="flex shrink-0 cursor-pointer items-center gap-1.5 px-2 py-1.5 text-white/80">
-            <input
-              type="checkbox"
-              checked={shown.includes(v.id)}
-              onChange={(e) =>
-                setShown((s) => (e.target.checked ? [...s, v.id] : s.filter((id) => id !== v.id)))
-              }
-            />
-            {v.name}
-          </label>
-        ))}
       </header>
 
       <div ref={stageRef} className="min-h-0 flex-1 overflow-x-auto overflow-y-hidden p-4">
@@ -123,7 +155,6 @@ export default function CompareView() {
               </div>
             </section>
           ))}
-          {cols.length === 0 ? <p className="m-auto text-white/50">Pick at least one variant above.</p> : null}
         </div>
       </div>
     </div>

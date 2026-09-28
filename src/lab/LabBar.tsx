@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Columns3, Eye, EyeOff, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import { DEFAULT_TUNING, useLab } from "./LabContext";
-import { AUTH_MODES, Divider, Segmented, chromeText } from "./ui";
+import { AUTH_MODES, Divider, Select, chromeText } from "./ui";
 import { variants } from "../navbars/registry";
 
 const HIDDEN_KEY = "navbar-lab:bar-hidden";
@@ -60,28 +60,20 @@ export default function LabBar({ current }: { current: string }) {
       {tuneOpen ? <TunePanel onClose={() => setTuneOpen(false)} /> : null}
 
       <div className="flex max-w-full items-center gap-1 overflow-x-auto [scrollbar-width:none] rounded-xl bg-[#16181b]/95 p-1.5 text-white shadow-[0_8px_30px_rgba(0,0,0,0.25)] backdrop-blur">
-        <Segmented
+        <Select
           label="Navbar variant"
-          options={variants.map((v, i) => ({
-            id: v.id,
-            label: (
-              <span title={v.description}>
-                <span className="opacity-40">{i + 1}</span> {v.name}
-              </span>
-            ),
-          }))}
+          options={variants.map((v, i) => ({ id: v.id, label: `${i + 1} ${v.name}`, title: v.description }))}
           value={current}
           onChange={(id) => (window.location.hash = id)}
         />
-        <Divider />
-        <Segmented label="Auth state" options={AUTH_MODES} value={auth} onChange={setAuth} />
+        <Select label="Auth state" prefix="Auth" options={AUTH_MODES} value={auth} onChange={setAuth} />
         <Divider />
         <button
           onClick={() => (window.location.hash = "compare")}
           className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1.5 text-white/80 hover:bg-white/10 hover:text-white"
-          title="Compare all variants side by side (C)"
+          title="Compare two variants side by side (C)"
         >
-          <Columns3 className="h-3.5 w-3.5" /> Compare
+          <Columns3 className="h-3.5 w-3.5" /> <span className="max-[479.98px]:sr-only">Compare</span>
         </button>
         <button
           onClick={() => setTuneOpen((o) => !o)}
@@ -91,7 +83,7 @@ export default function LabBar({ current }: { current: string }) {
           }`}
           title="Motion tuning"
         >
-          <SlidersHorizontal className="h-3.5 w-3.5" /> Tune
+          <SlidersHorizontal className="h-3.5 w-3.5" /> <span className="max-[479.98px]:sr-only">Tune</span>
         </button>
         <button
           onClick={() => setHidden(true)}

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { ChevronDown } from "lucide-react";
 import type { AuthMode } from "./LabContext";
 
 /** Shared bits of lab chrome. Deliberately not Questurian-styled, so it never reads as part of a navbar. */
@@ -10,33 +10,50 @@ export const AUTH_MODES: { id: AuthMode; label: string }[] = [
   { id: "loading", label: "Loading" },
 ];
 
-export function Segmented<T extends string>({
+/**
+ * Compact dropdown for the lab bars. Native <select> underneath, so it gets
+ * the platform picker on phones and full keyboard support for free.
+ */
+export function Select<T extends string>({
   options,
   value,
   onChange,
   label,
+  prefix,
+  className = "",
 }: {
-  options: { id: T; label: ReactNode }[];
+  options: { id: T; label: string; title?: string }[];
   value: T;
   onChange: (v: T) => void;
+  /** Accessible name. */
   label: string;
+  /** Short dim label shown inside the control, e.g. "Auth". */
+  prefix?: string;
+  className?: string;
 }) {
+  const current = options.find((o) => o.id === value);
   return (
-    <div role="radiogroup" aria-label={label} className="flex shrink-0 gap-0.5 rounded-lg bg-white/[0.06] p-0.5">
-      {options.map((o) => (
-        <button
-          key={o.id}
-          role="radio"
-          aria-checked={value === o.id}
-          onClick={() => onChange(o.id)}
-          className={`cursor-pointer whitespace-nowrap rounded-md px-2.5 py-1.5 transition-colors ${
-            value === o.id ? "bg-white text-[#16181b]" : "text-white/70 hover:bg-white/10 hover:text-white"
-          }`}
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
+    <span
+      title={current?.title}
+      className={`relative flex shrink-0 items-center gap-1.5 rounded-md bg-white/[0.07] py-1.5 pl-2.5 pr-2 text-white hover:bg-white/[0.12] has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-white/50 ${className}`}
+    >
+      {prefix ? <span className="text-white/45">{prefix}</span> : null}
+      <span className="whitespace-nowrap">{current?.label}</span>
+      <ChevronDown aria-hidden className="h-3 w-3 text-white/50" />
+      {/* The real control, invisible and covering the whole pill. */}
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(e) => onChange(e.target.value as T)}
+        className="absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0"
+      >
+        {options.map((o) => (
+          <option key={o.id} value={o.id}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </span>
   );
 }
 

@@ -30,9 +30,8 @@ never overwrite. `--interval <s>` and `--port <n>` are optional.
 ```
 src/navbars/
   original/     exact copy of the live navbar. Reference only, don't edit.
-  remix-a/      first remix: same code, motion wired to the lab sliders
+  remix-a/      scratch copy of atlantic, for trying changes without touching it
   atlantic/     Atlantic-style masthead: condenses to a thin bar, hides on scroll down
-  atlantic-q/   Atlantic remix: links bar above the wordmark; scrolls away, then a Q-only bar slides in
   atlantic-2/   Monocle-style: big wordmark scrolls under a pinned top bar, small one fades in once covered
   <your-id>/    every folder with a Navbar.tsx becomes a tab automatically
 src/lab/        lab chrome (tab bar, compare view, tuning) + stubs for app pieces
@@ -46,16 +45,17 @@ for the real ones (the mapping is listed at the top of `src/lab/stubs.tsx`).
 ## New variant
 
 ```bash
-pnpm new-variant remix-b                     # copies remix-a
+pnpm new-variant remix-b                     # copies remix-a (currently the Atlantic design)
 pnpm new-variant glass --from original --name "Glass"
 ```
 
 ## Using the lab
 
-- **Tabs** at the bottom switch variants. Each has its own URL (`#remix-a`), so you can open several browser tabs.
-- **Compare** shows every variant side by side in iframes at Desktop / Laptop / Tablet / Phone widths.
-  Sync scroll mirrors one frame's scroll to the others, so you can watch the transitions together.
-- **Auth** switches between Anon / User / Member / Loading, which change the right-hand controls.
+- **Variant dropdown** in the bar at the bottom switches navbars. Each has its own URL (`#remix-a`), so you can
+  open several browser tabs.
+- **Compare** shows two variants side by side in iframes, picked with the left/right dropdowns (⇄ swaps them),
+  at Desktop / Laptop / Tablet / Phone width. Sync mirrors one frame's scroll to the other.
+- **Auth dropdown** switches between Anon / User / Member / Loading, which change the right-hand controls.
 - **Tune** has live sliders for collapse distance and lerp smoothing (variants that call `useTuning()`),
   a guide line marking where the collapse finishes, and a live readout of `--navbar-collapse`.
 - Keys: `1`–`9` variants, `C` compare, `G` guide, `H` hide the lab bar.

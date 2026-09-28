@@ -7,7 +7,7 @@ export default function MobileNavbar() {
   const shouldShowSubscribe = !isAuthenticated || !isActive;
 
   return (
-    <nav className="h-[55px] min-h-[55px] w-full border-b border-black/10 bg-[#ece9e3] px-4 py-0">
+    <nav className="h-[55px] min-h-[55px] w-full border-b border-black/10 bg-[#faf7f2] px-4 py-0">
       <div className="flex h-[55px] min-h-[55px] items-center justify-between gap-3 max-[379.98px]:gap-2.5">
         <div className="flex min-h-8 min-w-0 flex-1 items-center gap-2 max-[379.98px]:gap-2.5">
           <MenuIcon
@@ -21,7 +21,7 @@ export default function MobileNavbar() {
           >
             <Logo
               variant="inline"
-              className="whitespace-nowrap font-bold leading-none text-[1.02rem] tracking-[0.06em] max-[479.98px]:font-extrabold 480:text-[1.35rem]"
+              className="whitespace-nowrap font-bold leading-none text-[1.2rem] tracking-[-0.01em] 480:text-[1.5rem]"
             />
           </Link>
         </div>
