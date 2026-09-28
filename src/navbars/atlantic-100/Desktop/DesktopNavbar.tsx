@@ -28,9 +28,9 @@ export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
     <div
       className="w-full border-b bg-[#faf7f2]"
       style={{
-        // Hairline shows once the bar has condensed, the Atlantic tell that
-        // you are now in the thin sticky header.
-        borderBottomColor: "rgba(0, 0, 0, calc(var(--navbar-collapse, 0) * 0.14))",
+        // One constant bottom rule. As the bar shrinks it rises over the
+        // section row and eats it from the bottom up.
+        borderBottomColor: "rgba(0, 0, 0, 0.14)",
         boxShadow:
           "0 1px 12px rgba(0, 0, 0, calc(var(--navbar-collapse, 0) * 0.06))",
       }}
@@ -51,7 +51,7 @@ export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
                 Newsletters only fits beside the wordmark from 1280px. */}
             <ul
               inert={!locked}
-              className={`flex items-center gap-6 font-[family-name:var(--font-dm-sans)] text-[0.74rem] font-semibold uppercase tracking-[0.14em] text-[#25292d] transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none ${
+              className={`flex items-center gap-6 font-[family-name:var(--font-dm-sans)] text-[0.74rem] font-semibold uppercase tracking-[0.14em] text-[#25292d] transition-[opacity,transform] duration-150 ease-out motion-reduce:transition-none ${
                 locked ? "translate-x-0 opacity-100" : "pointer-events-none -translate-x-2 opacity-0"
               }`}
             >
@@ -92,17 +92,17 @@ export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
         </div>
       </div>
 
-      {/* Section row: its height, opacity and rule all ride --navbar-collapse,
-          so it folds shut while the wordmark shrinks. The rule above it runs
-          edge to edge. */}
+      {/* Section row: no rule of its own. Its box shrinks from the bottom
+          (the links stay anchored to its top), so the bar's bottom rule
+          climbs over them, and they fade out as they're covered. */}
       <div
         className="overflow-hidden"
         style={{
           height: "calc(44px - var(--navbar-collapse, 0) * 44px)",
-          opacity: "calc(1 - var(--navbar-collapse, 0) * 1.6)",
+          opacity: "calc(1 - var(--navbar-collapse, 0) * 1.5)",
         }}
       >
-        <ul className="flex h-[44px] items-center justify-center gap-8 border-t border-black/15 px-6 font-[family-name:var(--font-dm-sans)] text-[0.74rem] font-semibold uppercase tracking-[0.14em] text-[#25292d]">
+        <ul className="flex h-[44px] items-center justify-center gap-8 px-6 font-[family-name:var(--font-dm-sans)] text-[0.74rem] font-semibold uppercase tracking-[0.14em] text-[#25292d]">
           {SECTIONS.map((s) => (
             <li key={s.href}>
               <Link href={s.href} className="hover:text-[#3B5BDB]">

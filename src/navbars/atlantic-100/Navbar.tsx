@@ -11,6 +11,11 @@ import MobileNavbar from "./Mobile/MobileNavbar";
 import { useEffect, useRef, useState } from "react";
 import { useTuning } from "@lab/LabContext";
 
+// The lerp's last few percent is invisible but slow (~0.5s from 0.97 to 1 at
+// the default smoothing), so the bar counts as locked once it is this close
+// to fully collapsed and still headed there.
+const LOCK_AT = 0.97;
+
 export default function Navbar() {
   const navRef = useRef<HTMLElement>(null);
   // True once the rendered collapse has settled at 1.
@@ -39,7 +44,7 @@ export default function Navbar() {
       if (targetVal === 1 && currentVal > 0.995) currentVal = 1;
       if (targetVal === 0 && currentVal < 0.005) currentVal = 0;
 
-      setLocked(currentVal === 1);
+      setLocked(targetVal === 1 && currentVal >= LOCK_AT);
       const borderAlpha = currentVal === 0 || currentVal === 1 ? 0.1 : 0;
       document.documentElement.style.setProperty(
         "--navbar-collapse",
