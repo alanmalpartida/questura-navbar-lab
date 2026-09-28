@@ -13,6 +13,18 @@ pnpm install
 pnpm dev
 ```
 
+### Auto-pull while a cloud session works
+
+```bash
+pnpm dev:sync            # dev server + pulls the current branch every 4s
+pnpm dev:sync --latest   # also jumps to the newest claude/* branch (each cloud session makes its own)
+```
+
+Anything pushed from a Claude cloud session shows up in the open browser tab within a few seconds;
+Vite hot-reloads it. If `package.json` or the lockfile changed it reinstalls and restarts the server.
+It only ever fast-forwards: local edits or local commits in the way make it pause and tell you,
+never overwrite. `--interval <s>` and `--port <n>` are optional.
+
 ## How it's laid out
 
 ```
