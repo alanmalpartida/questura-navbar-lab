@@ -52,7 +52,7 @@ export default function DesktopNavbar() {
           >
             <Logo />
           </Link>
-          <div className="flex items-center justify-self-end gap-4">
+          <div className="flex items-center justify-self-end gap-3">
             {(loading || shouldShowSubscribe) ? (
               <Link
                 href="/join"
@@ -67,6 +67,7 @@ export default function DesktopNavbar() {
               isAuthenticated={isAuthenticated}
               isMember={isActive}
               signInClassName="!text-black"
+              align="start"
             />
           </div>
         </div>
