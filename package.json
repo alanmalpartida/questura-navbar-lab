@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "new-variant": "node scripts/new-variant.mjs",
-    "render-globe": "node scripts/render-globe.mjs"
+    "render-globe": "node scripts/render-globe.mjs",
+    "render-globe-mark": "node scripts/render-globe-mark.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.553.0",

@@ -36,6 +36,7 @@ src/navbars/
   atlantic-2/   Monocle-style: big wordmark scrolls under a pinned top bar, small one fades in once covered
   atlantic-3/   theatlantic.com-style: wordmark across a broken rule shrinks into a locked bar, controls fade in
   atlantic-4/   atlantic-3 with an illustrated globe on the rule; globe + sections scroll away, small wordmark rides into the bar
+  globe-badge/  atlantic-100 with a small vector globe in the member badge instead of the Q
   <your-id>/    every folder with a Navbar.tsx becomes a tab automatically
 src/lab/        lab chrome (tab bar, compare view, tuning) + stubs for app pieces
 src/page/       the long fake city page the navbar scrolls over
