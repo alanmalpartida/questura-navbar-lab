@@ -33,6 +33,7 @@ src/navbars/
   atlantic-100/ working copy of atlantic, for trying changes without touching it
   atlantic/     Atlantic-style masthead: condenses to a thin bar, hides on scroll down
   atlantic-2/   Monocle-style: big wordmark scrolls under a pinned top bar, small one fades in once covered
+  atlantic-3/   theatlantic.com-style: wordmark across a broken rule shrinks into a locked bar, controls fade in
   <your-id>/    every folder with a Navbar.tsx becomes a tab automatically
 src/lab/        lab chrome (tab bar, compare view, tuning) + stubs for app pieces
 src/page/       the long fake city page the navbar scrolls over
