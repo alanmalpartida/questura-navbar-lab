@@ -31,6 +31,7 @@ never overwrite. `--interval <s>` and `--port <n>` are optional.
 src/navbars/
   original/     exact copy of the live navbar. Reference only, don't edit.
   atlantic-100/ working copy of atlantic, for trying changes without touching it
+  atlantic-150/ atlantic-100 in dark mode
   atlantic/     Atlantic-style masthead: condenses to a thin bar, hides on scroll down
   atlantic-2/   Monocle-style: big wordmark scrolls under a pinned top bar, small one fades in once covered
   atlantic-3/   theatlantic.com-style: wordmark across a broken rule shrinks into a locked bar, controls fade in
