@@ -53,12 +53,6 @@ export default function DesktopNavbar() {
             <Logo />
           </Link>
           <div className="flex items-center justify-self-end gap-4">
-            <AuthSlot
-              loading={loading}
-              isAuthenticated={isAuthenticated}
-              isMember={isActive}
-              signInClassName="!text-black"
-            />
             {(loading || shouldShowSubscribe) ? (
               <Link
                 href="/join"
@@ -68,20 +62,27 @@ export default function DesktopNavbar() {
                 <SubscribeButton />
               </Link>
             ) : null}
+            <AuthSlot
+              loading={loading}
+              isAuthenticated={isAuthenticated}
+              isMember={isActive}
+              signInClassName="!text-black"
+            />
           </div>
         </div>
       </div>
 
       {/* Section row: its height, opacity and rule all ride --navbar-collapse,
-          so it folds shut while the wordmark shrinks. */}
+          so it folds shut while the wordmark shrinks. The rule above it runs
+          edge to edge. */}
       <div
-        className="overflow-hidden px-6"
+        className="overflow-hidden"
         style={{
           height: "calc(44px - var(--navbar-collapse, 0) * 44px)",
           opacity: "calc(1 - var(--navbar-collapse, 0) * 1.6)",
         }}
       >
-        <ul className="mx-auto flex h-[44px] max-w-[1100px] items-center justify-center gap-8 border-t border-black/15 font-[family-name:var(--font-dm-sans)] text-[0.74rem] font-semibold uppercase tracking-[0.14em] text-[#25292d]">
+        <ul className="flex h-[44px] items-center justify-center gap-8 border-t border-black/15 px-6 font-[family-name:var(--font-dm-sans)] text-[0.74rem] font-semibold uppercase tracking-[0.14em] text-[#25292d]">
           {SECTIONS.map((s) => (
             <li key={s.href}>
               <Link href={s.href} className="hover:text-[#3B5BDB]">

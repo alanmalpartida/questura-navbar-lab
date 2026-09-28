@@ -30,7 +30,7 @@ never overwrite. `--interval <s>` and `--port <n>` are optional.
 ```
 src/navbars/
   original/     exact copy of the live navbar. Reference only, don't edit.
-  remix-a/      scratch copy of atlantic, for trying changes without touching it
+  atlantic-100/ working copy of atlantic, for trying changes without touching it
   atlantic/     Atlantic-style masthead: condenses to a thin bar, hides on scroll down
   atlantic-2/   Monocle-style: big wordmark scrolls under a pinned top bar, small one fades in once covered
   <your-id>/    every folder with a Navbar.tsx becomes a tab automatically
@@ -45,13 +45,13 @@ for the real ones (the mapping is listed at the top of `src/lab/stubs.tsx`).
 ## New variant
 
 ```bash
-pnpm new-variant remix-b                     # copies remix-a (currently the Atlantic design)
+pnpm new-variant remix-b                     # copies atlantic-100
 pnpm new-variant glass --from original --name "Glass"
 ```
 
 ## Using the lab
 
-- **Variant dropdown** in the bar at the bottom switches navbars. Each has its own URL (`#remix-a`), so you can
+- **Variant dropdown** in the bar at the bottom switches navbars. Each has its own URL (`#atlantic-100`), so you can
   open several browser tabs.
 - **Compare** shows two variants side by side in iframes, picked with the left/right dropdowns (⇄ swaps them),
   at Desktop / Laptop / Tablet / Phone width. Sync mirrors one frame's scroll to the other.

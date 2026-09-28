@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Usage: pnpm new-variant <id> [--from <variant>] [--name "Display name"]
 // Copies a variant folder under src/navbars/ and gives it its own meta.ts.
-// Defaults to copying remix-a, which is wired to the lab's motion sliders.
+// Defaults to copying atlantic-100, which is wired to the lab's motion sliders.
 import { cpSync, existsSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -10,7 +10,7 @@ const flag = (name) => {
   const i = args.indexOf(`--${name}`);
   return i === -1 ? undefined : args.splice(i, 2)[1];
 };
-const from = flag("from") ?? "remix-a";
+const from = flag("from") ?? "atlantic-100";
 const name = flag("name");
 const id = args[0];
 
