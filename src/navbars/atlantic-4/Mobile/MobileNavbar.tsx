@@ -32,7 +32,7 @@ export default function MobileNavbar({ locked }: MobileNavbarProps) {
       <div
         className="absolute right-0 z-20 px-4"
         style={{
-          top: `calc(var(--row) / 2 - ${c} * (var(--row) - var(--bar)) / 2)`,
+          top: `max(var(--bar) / 2, var(--row) / 2 - ${c} * var(--d))`,
           transform: "translateY(-50%)",
         }}
       >

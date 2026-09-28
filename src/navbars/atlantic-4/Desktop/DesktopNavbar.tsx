@@ -18,9 +18,9 @@ interface DesktopNavbarProps {
  * The menu and section links, twice: in the top row, which scrolls away with
  * the page (and the globe), and in the locked bar, where they slide back down
  * once the header has fully collapsed. The account controls are a single copy
- * that rides down with the header from the top row into the bar, level with
- * the wordmark the whole way. The globe, wordmark and rule live in Navbar.tsx;
- * geometry comes from its CSS vars.
+ * that moves up with the page until it is centred in the bar, then stays:
+ * always clear of the rule, which parks at the bar's bottom edge. The globe,
+ * wordmark and rule live in Navbar.tsx; geometry comes from its CSS vars.
  */
 export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
   return (
@@ -43,7 +43,7 @@ export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
       <div
         className="absolute right-0 z-20 px-6"
         style={{
-          top: `calc(var(--row) / 2 - ${c} * (var(--row) - var(--bar)) / 2)`,
+          top: `max(var(--bar) / 2, var(--row) / 2 - ${c} * var(--d))`,
           transform: "translateY(-50%)",
         }}
       >

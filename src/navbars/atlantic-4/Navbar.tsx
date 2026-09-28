@@ -4,12 +4,15 @@
 //   1. Top: menu + section links on the left, account controls on the right,
 //      a pixel globe centred across a hairline rule that stops short of it,
 //      and a small "Questurian" wordmark underneath.
-//   2. Scrolling: the globe, the menu and the section links scroll away with
-//      the page. The wordmark keeps its size and rises into the bar; the
-//      account controls travel with it and land beside it. The gap in the
-//      rule never closes on the way: it eases from the globe's width to the
-//      wordmark's while the one hands over to the other, holds while the
-//      wordmark passes through the rule, then seals once it is above it.
+//   2. Scrolling: the rule moves with the page until it reaches the bottom
+//      of the bar, then stays there. The globe, the menu and the section
+//      links scroll away; the wordmark keeps its size and rises through the
+//      rule into the bar. The account controls move up with the page until
+//      they are centred in the bar, ahead of the rule, and stay. The gap
+//      in the rule never closes on the way: it clears the whole globe
+//      drawing (clouds included), eases to the wordmark's width as the one
+//      hands over to the other, holds while the wordmark passes through,
+//      then seals once it is above the rule.
 //   3. Locked: the menu and section links slide back down into the bar.
 //
 // Same scroll mechanics as Atlantic 3: the header is fixed with an in-flow
@@ -17,16 +20,20 @@
 // distance scrolled, so collapse is scrollY / --d with no lerp. The lab's
 // motion sliders don't apply.
 //
-// The rule is the one piece placed from JS (--rule-y, --gap-l, --gap-r on
-// the nav): its gap follows two elements in turn, and it is snapped to whole
-// pixels so a 1px line never smears across two rows mid-scroll.
+// The rule is the one piece placed from JS (--rule-y, --rule-h, --gap-l,
+// --gap-r on the nav): its gap follows two elements in turn. A hairline that
+// creeps slowly across the screen flickers thick/thin wherever CSS pixels
+// don't land on device pixels (browser zoom, scaled displays), so it never
+// creeps: it moves 1:1 with the page, like any line in the content, then
+// parks. Its position and thickness are also snapped to device pixels.
 //
 // All geometry is CSS variables set per breakpoint on the wrapper below, and
 // everything is a calc() off --navbar-collapse:
 //   --row    top-row height (its controls are centred in it)
-//   --bar    locked bar height; also where the rule ends up
+//   --bar    locked bar height; also where the rule parks
 //   --d      scroll distance to lock (spacer = --bar + --d)
-//   --g      globe height; kept to whole multiples of its 32px pixel grid
+//   --g      globe height; a multiple of its 32-row pixel grid that lands on
+//            whole device pixels at 2x
 //   --gy0    globe centre; the rule starts here, through the middle of the disc
 //   --gfade  how fast the globe fades as it goes: on phones it passes the
 //            account controls, so it is gone a quarter of the way in
@@ -38,17 +45,31 @@
 import DesktopNavbar from "./Desktop/DesktopNavbar";
 import MobileNavbar from "./Mobile/MobileNavbar";
 import Link from "@lab/stubs";
-import { Logo, PixelGlobe } from "./shared/components";
+import { Logo, PIXEL_GLOBE_ASPECT, PixelGlobe } from "./shared/components";
 import { useEffect, useRef, useState } from "react";
 
 const c = "var(--navbar-collapse, 0)";
 
-/** The rule's gap around the globe, as a multiple of its height (= the
- *  disc's diameter): the disc plus a little air either side. The clouds
- *  overhang it and sit over the rule. */
-const GLOBE_GAP = 1.12;
+/** The rule's gap around the globe, as a multiple of its height: the whole
+ *  drawing, clouds included, plus a little air either side. */
+const GLOBE_GAP = PIXEL_GLOBE_ASPECT + 0.16;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+/** First collapse in 0..1 at which f goes from positive to <= 0 (f is
+ *  positive while the edge is still below the rule). */
+const crossing = (f: (k: number) => number) => {
+  if (f(0) <= 0) return 0;
+  if (f(1) > 0) return 1;
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 24; i++) {
+    const mid = (lo + hi) / 2;
+    if (f(mid) > 0) lo = mid;
+    else hi = mid;
+  }
+  return hi;
+};
 const ease = (t: number) => {
   const x = Math.min(1, Math.max(0, t));
   return x * x * (3 - 2 * x);
@@ -85,10 +106,9 @@ export default function Navbar() {
       setLocked(collapse === 1);
     };
 
-    // Everything moves linearly in collapse, so the hand-over points can be
-    // solved for directly:
-    //   cGlobe  the globe's bottom edge rises past the rule
-    //   cIn     the wordmark's top edge reaches the rule
+    // Hand-over points, each the collapse at which an edge meets the rule:
+    //   cGlobe  the globe's bottom edge rises past it
+    //   cIn     the wordmark's top edge reaches it
     //   cOut    the wordmark's bottom edge clears it
     // Gap: globe-wide until cGlobe, eases to the wordmark's box by cIn, holds
     // to cOut, then closes on the wordmark's centre by the time the bar locks.
@@ -97,13 +117,15 @@ export default function Navbar() {
       const mark = markRef.current;
       if (!nav || !mark) return;
       const { g, gy0, ty0, bar } = geo;
+      const dpr = window.devicePixelRatio || 1;
+      const snap = (v: number) => Math.round(v * dpr) / dpr;
 
-      const ruleY = Math.round(gy0 - collapse * (gy0 - bar));
+      const ruleAt = (k: number) => Math.max(bar, gy0 - k * d);
       const th = mark.offsetHeight;
-      const rate = ty0 - gy0 + bar / 2; // wordmark's speed relative to the rule
-      const cGlobe = g / 2 / (g / 2 + bar);
-      const cIn = (ty0 - th / 2 - gy0) / rate;
-      const cOut = (ty0 + th / 2 - gy0) / rate;
+      const markY = (k: number) => ty0 - k * (ty0 - bar / 2);
+      const cGlobe = crossing((k) => gy0 + g / 2 - k * (gy0 + g / 2) - ruleAt(k));
+      const cIn = crossing((k) => markY(k) - th / 2 - ruleAt(k));
+      const cOut = crossing((k) => markY(k) + th / 2 - ruleAt(k));
 
       const mid = nav.clientWidth / 2;
       const half = g * GLOBE_GAP / 2;
@@ -117,9 +139,12 @@ export default function Navbar() {
       left = lerp(left, centre, seal);
       right = lerp(right, centre, seal);
 
-      nav.style.setProperty("--rule-y", `${ruleY - 1}px`);
-      nav.style.setProperty("--gap-l", `${Math.round(left)}px`);
-      nav.style.setProperty("--gap-r", `${Math.round(right)}px`);
+      // One device pixel at 1x, two at 2x: 1 CSS px wherever that is whole.
+      const h = Math.max(1, Math.round(dpr)) / dpr;
+      nav.style.setProperty("--rule-h", `${h}px`);
+      nav.style.setProperty("--rule-y", `${snap(ruleAt(collapse)) - h}px`);
+      nav.style.setProperty("--gap-l", `${Math.floor(left * dpr) / dpr}px`);
+      nav.style.setProperty("--gap-r", `${Math.ceil(right * dpr) / dpr}px`);
     };
 
     const schedule = () => {
@@ -145,15 +170,15 @@ export default function Navbar() {
     <div
       ref={wrapRef}
       className="
-        [--row:64px] [--bar:55px] [--d:109px]
-        [--g:64px] [--gy0:90px] [--gfade:4] [--ty0:141px] [--fs:1.02rem]
+        [--row:64px] [--bar:55px] [--d:129px]
+        [--g:80px] [--gy0:100px] [--gfade:4] [--ty0:160px] [--fs:1.2rem]
         [--x1:56px] [--tx1:50%]
-        480:[--fs:1.35rem] 480:[--ty0:144px] 480:[--d:115px]
-        1024:[--row:112px] 1024:[--bar:64px] 1024:[--d:136px]
-        1024:[--g:96px] 1024:[--gy0:88px] 1024:[--gfade:0] 1024:[--ty0:166px] 1024:[--fs:1.9rem]
+        480:[--fs:1.55rem] 480:[--ty0:162px] 480:[--d:135px]
+        1024:[--row:112px] 1024:[--bar:64px] 1024:[--d:164px]
+        1024:[--g:128px] 1024:[--gy0:94px] 1024:[--gfade:0] 1024:[--ty0:190px] 1024:[--fs:2.3rem]
         1024:[--x1:50%] 1024:[--tx1:0%]
-        1280:[--row:120px] 1280:[--d:164px]
-        1280:[--g:128px] 1280:[--gy0:100px] 1280:[--ty0:194px]
+        1280:[--row:120px] 1280:[--d:196px]
+        1280:[--g:160px] 1280:[--gy0:108px] 1280:[--ty0:220px]
       "
     >
       {/* Holds the expanded header's place in the page. */}
@@ -171,12 +196,12 @@ export default function Navbar() {
           <MobileNavbar locked={locked} />
         </div>
 
-        {/* The rule: starts through the globe's centre, ends under the locked
+        {/* The rule: starts through the globe's centre, parks under the locked
             bar. Two segments either side of the gap placed by placeRule();
             the fallbacks are its resting state, for the frame before it runs. */}
         <div
           aria-hidden
-          className="absolute left-0 h-px bg-black/45"
+          className="absolute left-0 h-[var(--rule-h,1px)] bg-black/45"
           style={{
             top: "var(--rule-y, calc(var(--gy0) - 1px))",
             width: `var(--gap-l, calc(50% - var(--g) * ${GLOBE_GAP / 2}))`,
@@ -184,7 +209,7 @@ export default function Navbar() {
         />
         <div
           aria-hidden
-          className="absolute right-0 h-px bg-black/45"
+          className="absolute right-0 h-[var(--rule-h,1px)] bg-black/45"
           style={{
             top: "var(--rule-y, calc(var(--gy0) - 1px))",
             left: `var(--gap-r, calc(50% + var(--g) * ${GLOBE_GAP / 2}))`,
@@ -192,7 +217,7 @@ export default function Navbar() {
         />
 
         {/* The globe scrolls away with the page, clearing the top edge exactly
-            as the bar locks (on desktop --d is set so that is page speed).
+            as the bar locks (--d is set so that is close to page speed).
             The wordmark below is the home link for keyboards and screen
             readers, so this one is not. */}
         <Link
@@ -214,7 +239,7 @@ export default function Navbar() {
             the breathing room either side of it in the rule's gap. */}
         <div
           ref={markRef}
-          className="absolute z-10 whitespace-nowrap px-[0.3em] leading-none"
+          className="absolute z-10 whitespace-nowrap px-[0.4em] leading-none"
           style={{
             top: `calc(var(--ty0) - ${c} * (var(--ty0) - var(--bar) / 2))`,
             left: `calc((1 - ${c}) * 50% + ${c} * var(--x1))`,
