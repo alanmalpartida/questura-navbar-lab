@@ -92,20 +92,17 @@ export default function DesktopNavbar({ locked }: DesktopNavbarProps) {
         </div>
       </div>
 
-      {/* Section row, between the divider on top and the bar's own bottom
-          rule. The row shrinks from the bottom only: the links stay pinned
-          to the divider and the bottom rule climbs up over them, fading them
-          as it goes. At zero height the divider is clipped exactly where the
-          bottom rule reaches it, leaving one line under the thin bar. */}
+      {/* Section row: no rule of its own. Its box shrinks from the bottom
+          (the links stay anchored to its top), so the bar's bottom rule
+          climbs over them, and they fade out as they're covered. */}
       <div
-        className="relative overflow-hidden"
-        style={{ height: "calc(44px - var(--navbar-collapse, 0) * 44px)" }}
+        className="overflow-hidden"
+        style={{
+          height: "calc(44px - var(--navbar-collapse, 0) * 44px)",
+          opacity: "calc(1 - var(--navbar-collapse, 0) * 1.5)",
+        }}
       >
-        <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-black/[0.14]" />
-        <ul
-          className="flex h-[44px] w-full shrink-0 items-center justify-center gap-8 px-6 font-[family-name:var(--font-dm-sans)] text-[0.74rem] font-semibold uppercase tracking-[0.14em] text-[#25292d]"
-          style={{ opacity: "calc(1 - var(--navbar-collapse, 0) * 1.5)" }}
-        >
+        <ul className="flex h-[44px] items-center justify-center gap-8 px-6 font-[family-name:var(--font-dm-sans)] text-[0.74rem] font-semibold uppercase tracking-[0.14em] text-[#25292d]">
           {SECTIONS.map((s) => (
             <li key={s.href}>
               <Link href={s.href} className="hover:text-[#3B5BDB]">
