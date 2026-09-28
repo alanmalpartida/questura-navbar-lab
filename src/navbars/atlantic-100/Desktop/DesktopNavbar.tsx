@@ -8,12 +8,9 @@ import {
 
 // Section row under the masthead. Folds away as --navbar-collapse → 1.
 const SECTIONS = [
-  { label: "Neighbourhoods", href: "/neighbourhoods" },
   { label: "Eat", href: "/eat" },
   { label: "Stay", href: "/stay" },
   { label: "Itineraries", href: "/itineraries" },
-  { label: "Culture", href: "/culture" },
-  { label: "Maps", href: "/maps" },
   { label: "Newsletters", href: "/newsletters" },
 ];
 
