@@ -7,6 +7,10 @@ interface LogoProps {
   variant?: "default" | "inline";
 }
 
+// Tinos (Google Fonts; the same design as Liberation Serif, metric-compatible
+// with Times New Roman). Porting back means adding it via next/font.
+const WORDMARK_FONT = "Tinos, 'Liberation Serif', 'Times New Roman', serif";
+
 /**
  * Title-case serif wordmark. It has no size of its own: it inherits
  * font-size from its parent, which in this variant is driven by scroll.
@@ -28,10 +32,11 @@ export default function Logo({
           page gets its single <h1> from its own content. */}
       <span
         className={`
-          block font-display text-[#16181b] font-bold leading-none m-0 p-0
+          block text-[#16181b] font-bold leading-none m-0 p-0
           ${isInline ? "text-left" : ""}
           ${className}
         `}
+        style={{ fontFamily: WORDMARK_FONT }}
       >
         Questurian
       </span>

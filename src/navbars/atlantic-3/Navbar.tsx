@@ -80,12 +80,12 @@ export default function Navbar() {
     <div
       ref={wrapRef}
       className="
-        [--row:55px] [--bar:55px] [--line0:80px] [--d:69px]
-        [--f0:2.1rem] [--f1:1.02rem] [--cy0:74px]
+        [--row:55px] [--bar:55px] [--line0:84px] [--d:77px]
+        [--f0:2.1rem] [--f1:1.02rem] [--cy0:78px]
         [--x1:56px] [--tx1:50%]
         380:[--f0:2.5rem] 480:[--f1:1.35rem]
-        1024:[--row:88px] 1024:[--bar:64px] 1024:[--line0:88px] 1024:[--d:100px]
-        1024:[--f0:4.25rem] 1024:[--f1:1.9rem] 1024:[--cy0:80px]
+        1024:[--row:100px] 1024:[--bar:64px] 1024:[--line0:108px] 1024:[--d:124px]
+        1024:[--f0:4.25rem] 1024:[--f1:1.9rem] 1024:[--cy0:100px]
         1024:[--x1:50%] 1024:[--tx1:0%]
         1280:[--f0:5.25rem]
       "
@@ -108,7 +108,7 @@ export default function Navbar() {
         {/* The rule: starts through the wordmark, ends under the locked bar. */}
         <div
           aria-hidden
-          className="absolute inset-x-0 h-px bg-black/20"
+          className="absolute inset-x-0 h-px bg-black/45"
           style={{ top: `calc(var(--line0) - ${c} * (var(--line0) - var(--bar)) - 1px)` }}
         />
 
