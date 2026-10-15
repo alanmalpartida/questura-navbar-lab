@@ -21,7 +21,8 @@ export default function UserIcon({ buttonClassName = "", isMember = false }: Use
         {isMember ? (
           <span
             className="relative flex h-[22px] w-[22px] shrink-0 rounded-full 480:h-[28px] 480:w-[28px]"
-            style={{ boxShadow: '0 0 0 1px rgba(172,128,32,0.8)' }}
+            // Dark behind the globe so its anti-aliased edge never shows a light hairline.
+            style={{ background: '#04101E', boxShadow: '0 0 0 1px rgba(172,128,32,0.8)' }}
           >
             <GlobeMark className="block h-full w-full" />
             <span
